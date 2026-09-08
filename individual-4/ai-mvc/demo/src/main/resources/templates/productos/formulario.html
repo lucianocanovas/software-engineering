@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo + ' | Ferreteria Norte'}">Producto | Ferreteria Norte</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container py-2"><a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/productos}"><span class="brand-mark">FN</span><span>Ferreteria <strong>Norte</strong></span></a></div>
+</nav>
+<main class="container py-5 form-page">
+    <a class="back-link" th:href="@{/productos}">← Volver al catalogo</a>
+    <section class="form-panel mt-4">
+        <div class="panel-heading mb-4"><p class="eyebrow mb-2">Ficha de inventario</p><h1 th:text="${titulo}">Registrar producto</h1><p class="mb-0">Completa los datos para mantener tu catalogo al dia.</p></div>
+        <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">Revisa los campos marcados antes de guardar.</div>
+        <form th:action="@{/productos/guardar}" th:object="${producto}" method="post" novalidate>
+            <input type="hidden" th:field="*{codProducto}">
+            <div class="row g-4">
+                <div class="col-md-7"><label class="form-label" for="nombre">Nombre del producto</label><input class="form-control" id="nombre" type="text" th:field="*{nombre}" placeholder="Ej. Taladro percutor"><div class="field-error" th:errors="*{nombre}"></div></div>
+                <div class="col-md-5"><label class="form-label" for="marca">Marca</label><input class="form-control" id="marca" type="text" th:field="*{marca}" placeholder="Ej. Bosch"><div class="field-error" th:errors="*{marca}"></div></div>
+                <div class="col-md-5"><label class="form-label" for="categoria">Categoria</label><input class="form-control" id="categoria" type="text" th:field="*{categoria}" placeholder="Ej. Herramientas electricas"><div class="field-error" th:errors="*{categoria}"></div></div>
+                <div class="col-md-4"><label class="form-label" for="precio">Precio</label><div class="input-group"><span class="input-group-text">$</span><input class="form-control" id="precio" type="number" min="0.01" step="0.01" th:field="*{precio}" placeholder="0.00"></div><div class="field-error" th:errors="*{precio}"></div></div>
+                <div class="col-md-3"><label class="form-label" for="stock">Stock</label><input class="form-control" id="stock" type="number" min="0" th:field="*{stock}" placeholder="0"><div class="field-error" th:errors="*{stock}"></div></div>
+                <div class="col-12"><label class="form-label" for="descripcion">Descripcion <span>(opcional)</span></label><textarea class="form-control" id="descripcion" rows="4" th:field="*{descripcion}" placeholder="Materiales, medidas o detalles utiles..."></textarea><div class="field-error" th:errors="*{descripcion}"></div></div>
+            </div>
+            <div class="form-actions mt-5 d-flex flex-column flex-sm-row justify-content-end gap-3"><a class="btn btn-light btn-lg" th:href="@{/productos}">Cancelar</a><button class="btn btn-primary btn-lg action-button" type="submit">Guardar producto</button></div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

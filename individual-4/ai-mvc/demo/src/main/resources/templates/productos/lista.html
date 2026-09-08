@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventario | Ferreteria Norte</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark app-nav">
+    <div class="container py-2">
+        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/productos}">
+            <span class="brand-mark">FN</span>
+            <span>Ferreteria <strong>Norte</strong></span>
+        </a>
+        <span class="nav-caption">Panel de inventario</span>
+    </div>
+</nav>
+
+<main class="container py-5">
+    <section class="hero d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-4 mb-5">
+        <div>
+            <p class="eyebrow mb-2">Control operativo / Productos</p>
+            <h1>Inventario que<br><span>trabaja contigo.</span></h1>
+            <p class="lead-copy mb-0">Administra herramientas, materiales y suministros desde un solo lugar.</p>
+        </div>
+        <a class="btn btn-primary btn-lg action-button" th:href="@{/productos/nuevo}">
+            <span class="plus-icon">+</span> Nuevo producto
+        </a>
+    </section>
+
+    <section class="stats-row row g-3 mb-4">
+        <div class="col-sm-6 col-lg-4">
+            <div class="stat-panel">
+                <span class="stat-label">Productos registrados</span>
+                <strong th:text="${#lists.size(productos)}">0</strong>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="stat-panel accent-panel">
+                <span class="stat-label">Estado del sistema</span>
+                <strong><span class="status-dot"></span> Operativo</strong>
+            </div>
+        </div>
+        <div class="col-lg-4 d-none d-lg-block">
+            <div class="stat-note">Base local SQLite<br><span>Sin configuracion externa</span></div>
+        </div>
+    </section>
+
+    <section class="table-panel">
+        <div class="panel-heading d-flex flex-column flex-md-row justify-content-between gap-2">
+            <div>
+                <h2>Catalogo de productos</h2>
+                <p class="mb-0">Consulta y actualiza el stock disponible.</p>
+            </div>
+            <span class="live-tag">ACTUALIZADO EN VIVO</span>
+        </div>
+        <div class="table-responsive" th:if="${!#lists.isEmpty(productos)}">
+            <table class="table align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>Codigo</th><th>Producto</th><th>Categoria</th><th>Precio</th><th>Stock</th><th class="text-end">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="producto : ${productos}">
+                    <td class="code-cell" th:text="${'#' + producto.codProducto}">#01</td>
+                    <td>
+                        <div class="product-name" th:text="${producto.nombre}">Llave francesa</div>
+                        <div class="product-brand" th:text="${producto.marca + ' / ' + producto.descripcion}">Bahco / Acero cromado</div>
+                    </td>
+                    <td><span class="category-pill" th:text="${producto.categoria}">Llaves</span></td>
+                    <td class="price-cell" th:text="${'$ ' + #numbers.formatDecimal(producto.precio, 1, 2)}">$ 0.00</td>
+                    <td><span class="stock-value" th:classappend="${producto.stock < 5 ? ' low-stock' : ''}" th:text="${producto.stock + ' un.'}">20 un.</span></td>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-2">
+                            <a class="btn btn-sm btn-outline-secondary" th:href="@{/productos/editar/{id}(id=${producto.codProducto})}">Editar</a>
+                            <form th:action="@{/productos/eliminar/{id}(id=${producto.codProducto})}" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este producto?');">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(productos)}">
+            <div class="empty-icon">+</div>
+            <h3>El catalogo esta listo para comenzar</h3>
+            <p>Aun no hay productos cargados en tu inventario.</p>
+            <a class="btn btn-primary" th:href="@{/productos/nuevo}">Registrar primer producto</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

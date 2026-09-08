@@ -1,0 +1,4 @@
+target/
+ferreteria.db
+ferreteria.db-shm
+ferreteria.db-wal
