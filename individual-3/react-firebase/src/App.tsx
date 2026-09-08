@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './config/firebase';
 import './App.css';
+import ItemCard from './components/itemCard';
 
 interface Item {
   id: string;
@@ -126,9 +127,9 @@ function App() {
   };
 
   // EDIT (populate form)
-  const handleEdit = (item: Item) => {
+  const handleEdit = (item: { id: string; title: string; description?: string }) => {
     setTitle(item.title);
-    setDescription(item.description);
+    setDescription(item.description ?? '');
     setEditingId(item.id);
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -201,27 +202,12 @@ function App() {
         ) : (
           <div className="items-list">
             {items.map((item) => (
-              <div key={item.id} className="item-card">
-                <div className="item-id">ID: {item.id.substring(0, 8)}...</div>
-                <h3 className="item-title">{item.title}</h3>
-                {item.description && (
-                  <p className="item-description">{item.description}</p>
-                )}
-                <div className="item-actions">
-                  <button
-                    className="btn-edit"
-                    onClick={() => handleEdit(item)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+              <ItemCard
+                key={item.id}
+                item={item}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
