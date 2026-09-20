@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main-layout :: layout(~{::title}, 'diagrama', ~{::content})}">
+<head>
+    <title>Diseño UML y Arquitectura • Inciso a</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="mb-4">
+            <h3 class="fw-bold mb-1"><i class="bi bi-diagram-3-fill text-primary me-2"></i> Diagrama de Clases de Diseño (Inciso a)</h3>
+            <p class="text-muted mb-0">Modelado formal de entidades, atributos, cardinalidades, métodos y relaciones de Asociación, Agregación, Composición y Herencia.</p>
+        </div>
+
+        <!-- Renderizado de Mermaid Diagram -->
+        <div class="card content-card mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark"><i class="bi bi-cpu me-2"></i> Diagrama de Clases Rediseñado (Mermaid UML)</span>
+                <span class="badge bg-primary">UML 2.5</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="mermaid text-center">
+classDiagram
+    direction TB
+
+    class AuditableEntity {
+        <<abstract / MappedSuperclass>>
+        #LocalDateTime fechaCreacion
+        #LocalDateTime fechaModificacion
+        #String creadoPor
+        #String modificadoPor
+    }
+
+    class Persona {
+        <<abstract>>
+        #UUID id
+        #String dni
+        #String nombre
+        #String apellido
+        #String email
+        #Sexo sexo
+        #LocalDate fechaNacimiento
+        #String password
+        #Rol rol
+        +getNombreCompleto() String
+    }
+
+    class Profesor {
+        -Integer legajo
+        -String especialidad
+        -Double salario
+        +agregarMateria(Materia m) void
+        +agregarAula(Aula a) void
+    }
+
+    class Alumno {
+        -Integer codigo
+        -LocalDate fechaIngreso
+        +calcularPromedio() Double
+    }
+
+    class Colegio {
+        -UUID id
+        -String nombre
+        -String direccion
+        -String telefono
+        +agregarGrado(Grado g) void
+    }
+
+    class Grado {
+        -UUID id
+        -String nivel
+        -Integer anio
+        +agregarAula(Aula a) void
+    }
+
+    class Aula {
+        -UUID id
+        -String division
+        -String turno
+        -Integer capacidad
+        +getNombreCompleto() String
+    }
+
+    class Materia {
+        -UUID id
+        -String nombre
+        -Integer horas
+        -String descripcion
+    }
+
+    class Evaluacion {
+        -UUID id
+        -String titulo
+        -String tipo
+        -LocalDate fecha
+        -Double ponderacion
+        +agregarNota(Nota n) void
+    }
+
+    class Nota {
+        -UUID id
+        -Double puntaje
+        -LocalDate fecha
+        -String observaciones
+        +isAprobada() boolean
+    }
+
+    AuditableEntity <|-- Persona : Herencia JPA
+    Persona <|-- Profesor : Herencia
+    Persona <|-- Alumno : Herencia
+
+    Colegio "1" *-- "1..*" Grado : Composición
+    Grado "1" *-- "1..*" Aula : Composición
+    Aula "1" o-- "0..*" Alumno : Agregación
+
+    Profesor "1..*" -- "1..*" Materia : Asociación (Dicta)
+    Profesor "1..*" -- "1..*" Aula : Asociación (Asignado)
+    Materia "1" -- "0..*" Evaluacion : Asociación
+    Evaluacion "1" *-- "1..*" Nota : Composición
+    Alumno "1" -- "0..*" Nota : Asociación (Califica)
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla Justificación de Relaciones UML -->
+        <div class="card content-card mb-4">
+            <div class="card-header bg-light">
+                <span class="fw-bold text-dark"><i class="bi bi-card-checklist me-2"></i> Justificación de Relaciones UML y Mapeo ORM (Hibernate / SQLite3)</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Relación UML</th>
+                                <th>Entidades Involucradas</th>
+                                <th>Cardinalidad</th>
+                                <th>Significado de Negocio y Mapeo Técnico</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-primary">Herencia</span></td>
+                                <td><code>Persona</code> &rarr; <code>Profesor</code>, <code>Alumno</code></td>
+                                <td>1 a 1 (Especialización)</td>
+                                <td>
+                                    Generalización de atributos compartidos (<code>dni, nombre, apellido, email, sexo, fechaNacimiento, password, rol</code>).
+                                    Mapeado mediante <code>@Inheritance(strategy = InheritanceType.JOINED)</code>.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-danger">Composición</span></td>
+                                <td><code>Colegio</code> &rarr; <code>Grado</code> &rarr; <code>Aula</code></td>
+                                <td>1 a 1..* (Todo - Parte Fuerte)</td>
+                                <td>
+                                    Dependencia existencial estricta. Un grado o aula no existe fuera de su colegio o grado. 
+                                    Mapeado con <code>CascadeType.ALL</code> y <code>orphanRemoval = true</code>.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-danger">Composición</span></td>
+                                <td><code>Evaluacion</code> &rarr; <code>Nota</code></td>
+                                <td>1 a 1..* (Todo - Parte Fuerte)</td>
+                                <td>
+                                    Una calificación (Nota) no tiene razón de existir ni sentido sin el examen (Evaluación) que le da origen.
+                                    Al borrarse una evaluación, se eliminan sus notas en cascada (<code>orphanRemoval = true</code>).
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-warning text-dark">Agregación</span></td>
+                                <td><code>Aula</code> &rarr; <code>Alumno</code></td>
+                                <td>1 a 0..* (Todo - Parte Débil)</td>
+                                <td>
+                                    El aula agrupa alumnos matriculados. Sin embargo, los estudiantes tienen ciclo de vida independiente:
+                                    si el aula se clausura o disuelve, los alumnos siguen existiendo en el colegio (sin cascade remove).
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-info text-dark">Asociación</span></td>
+                                <td><code>Profesor</code> &harr; <code>Materia</code></td>
+                                <td>1..* a 1..*</td>
+                                <td>
+                                    Un docente dicta varias asignaturas y una asignatura puede tener varios docentes asignados.
+                                    Mapeado con tabla intermedia <code>@ManyToMany</code> (<code>profesor_materia</code>).
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-info text-dark">Asociación</span></td>
+                                <td><code>Alumno</code> &harr; <code>Nota</code></td>
+                                <td>1 a 0..*</td>
+                                <td>
+                                    Cada registro de calificación se encuentra asociado formalmente al estudiante al que califica.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explicación de las Capas y Seguridad -->
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card content-card h-100 p-3">
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-shield-check me-2"></i> Seguridad y Acceso Docente</h6>
+                    <ul class="text-muted small mb-0">
+                        <li><strong>Credencial de usuario:</strong> Correo personal del docente (<code>email</code>).</li>
+                        <li><strong>Cifrado:</strong> Hash irreversible con <code>BCryptPasswordEncoder</code>.</li>
+                        <li><strong>Cambio de clave:</strong> Endpoint protegido <code>/perfil/cambiar-password</code> con verificación de clave anterior.</li>
+                        <li><strong>Bienvenida:</strong> Despacho automático de correo electrónico al registrarse mediante <code>EmailService</code>.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card content-card h-100 p-3">
+                    <h6 class="fw-bold text-success mb-2"><i class="bi bi-database-check me-2"></i> Capa DTO y Auditoría</h6>
+                    <ul class="text-muted small mb-0">
+                        <li><strong>DTOs aislados:</strong> <code>DocenteRegistroDTO</code>, <code>AlumnoDTO</code>, <code>NotaDTO</code>, etc. para evitar <em>Over-posting</em>.</li>
+                        <li><strong>Auditoría JPA:</strong> Trazabilidad mediante <code>AuditableEntity</code> con <code>fechaCreacion</code>, <code>creadoPor</code>, <code>fechaModificacion</code>.</li>
+                        <li><strong>Persistencia:</strong> ORM Hibernate con dialecto nativo para base relacional SQLite3 (<code>colegio.db</code>).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>
+

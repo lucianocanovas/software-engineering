@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Fragmento Sidebar moderno estilo ThemeWagon / Admin Dashboard -->
+    <aside th:fragment="sidebarFragment(activeTab)" class="sidebar d-flex flex-column flex-shrink-0">
+        <div class="brand d-flex align-items-center">
+            <i class="bi bi-mortarboard-fill text-primary fs-3 me-2"></i>
+            <div>
+                <div class="fw-bold text-white">Colegio San Martín</div>
+                <small class="text-muted" style="font-size: 0.75rem;">Gestión Escolar MVC</small>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills flex-column mb-auto py-3">
+            <li class="nav-item">
+                <a th:href="@{/dashboard}" class="nav-link" th:classappend="${activeTab == 'dashboard'} ? 'active' : ''">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Panel Principal</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/docentes}" class="nav-link" th:classappend="${activeTab == 'docentes'} ? 'active' : ''">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>Cuerpo Docente</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/alumnos}" class="nav-link" th:classappend="${activeTab == 'alumnos'} ? 'active' : ''">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Alumnos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/materias}" class="nav-link" th:classappend="${activeTab == 'materias'} ? 'active' : ''">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                    <span>Materias</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/notas}" class="nav-link" th:classappend="${activeTab == 'notas'} ? 'active' : ''">
+                    <i class="bi bi-clipboard-check-fill"></i>
+                    <span>Evaluaciones y Notas</span>
+                </a>
+            </li>
+
+            <hr class="border-secondary my-3 mx-3 opacity-25">
+
+            <li class="nav-item">
+                <a th:href="@{/perfil/cambiar-password}" class="nav-link" th:classappend="${activeTab == 'perfil'} ? 'active' : ''">
+                    <i class="bi bi-shield-lock-fill"></i>
+                    <span>Cambiar Contraseña</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/docs/diagrama}" class="nav-link" th:classappend="${activeTab == 'diagrama'} ? 'active' : ''">
+                    <i class="bi bi-diagram-3-fill"></i>
+                    <span>Diagrama Clases UML</span>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Pie del sidebar con información institucional -->
+        <div class="p-3 border-top border-secondary border-opacity-25 text-center text-muted" style="font-size: 0.8rem;">
+            <i class="bi bi-cpu-fill text-info me-1"></i> Spring Boot + SQLite3
+        </div>
+    </aside>
+</body>
+</html>
+

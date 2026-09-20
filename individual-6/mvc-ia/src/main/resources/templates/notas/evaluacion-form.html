@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main-layout :: layout(~{::title}, 'notas', ~{::content})}">
+<head>
+    <title>Planificar Evaluación • Sistema Escolar</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="mb-4">
+            <a th:href="@{/notas}" class="btn btn-sm btn-outline-secondary mb-2">
+                <i class="bi bi-arrow-left me-1"></i> Volver a Evaluaciones
+            </a>
+            <h3 class="fw-bold mb-1">Planificar Nueva Evaluación</h3>
+            <p class="text-muted mb-0">Cree un examen, trabajo práctico o instancia evaluativa para una materia.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7">
+                <div class="card content-card p-4">
+                    <form th:action="@{/evaluaciones/guardar}" th:object="${evaluacion}" method="post">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="titulo" class="form-label fw-semibold small">Título de la Evaluación <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="titulo" th:field="*{titulo}" placeholder="Ej: Segundo Examen Parcial de Geometría" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="tipo" class="form-label fw-semibold small">Tipo de Evaluación <span class="text-danger">*</span></label>
+                                <select class="form-select" id="tipo" th:field="*{tipo}" required>
+                                    <option value="" disabled selected>Seleccione tipo...</option>
+                                    <option value="Examen Parcial">Examen Parcial</option>
+                                    <option value="Trabajo Práctico">Trabajo Práctico</option>
+                                    <option value="Examen Final">Examen Final</option>
+                                    <option value="Lección Oral">Lección Oral</option>
+                                </select>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="fecha" class="form-label fw-semibold small">Fecha de la Evaluación <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fecha" th:field="*{fecha}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="materiaId" class="form-label fw-semibold small">Materia Correspondiente <span class="text-danger">*</span></label>
+                                <select class="form-select" id="materiaId" th:field="*{materiaId}" required>
+                                    <option value="" disabled selected>Seleccione Materia...</option>
+                                    <option th:each="m : ${materias}" th:value="${m.id}" th:text="${m.nombre} + ' (' + ${m.gradoNombre} + ')'"></option>
+                                </select>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('materiaId')}" th:errors="*{materiaId}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="profesorId" class="form-label fw-semibold small">Docente Responsable</label>
+                                <select class="form-select" id="profesorId" th:field="*{profesorId}">
+                                    <option value="">Docente Autenticado (por defecto)</option>
+                                    <option th:each="d : ${docentes}" th:value="${d.id}" th:text="${d.nombreCompleto}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a th:href="@{/notas}" class="btn btn-light">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check2 me-1"></i> Crear Evaluación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

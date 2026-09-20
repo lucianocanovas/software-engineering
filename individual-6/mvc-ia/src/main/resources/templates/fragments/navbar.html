@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Fragmento Navbar superior con información de sesión y cierre de sesión -->
+    <header th:fragment="navbarFragment" class="top-navbar d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <h5 class="mb-0 fw-semibold text-secondary">
+                <i class="bi bi-mortarboard me-2"></i> Plataforma Académica
+            </h5>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <!-- Información del Usuario Autenticado -->
+            <div class="text-end d-none d-md-block">
+                <div class="fw-semibold text-dark" sec:authentication="name">correo@colegio.edu.ar</div>
+                <small class="text-muted">Docente Activo</small>
+            </div>
+
+            <!-- Avatar y Menú Desplegable -->
+            <div class="dropdown">
+                <button class="btn btn-light rounded-circle p-2 border shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-fill text-primary fs-5"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <li class="px-3 py-2 border-bottom">
+                        <span class="text-muted small">Conectado como:</span><br>
+                        <strong sec:authentication="name" class="small text-truncate d-inline-block" style="max-width: 200px;">email</strong>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2 d-flex align-items-center gap-2" th:href="@{/perfil/cambiar-password}">
+                            <i class="bi bi-key-fill text-warning"></i> Cambiar Contraseña
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2 d-flex align-items-center gap-2" th:href="@{/docs/diagrama}">
+                            <i class="bi bi-diagram-3-fill text-info"></i> Arquitectura y Clases
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider my-1"></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                            <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center gap-2">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+</body>
+</html>
+

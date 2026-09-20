@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Fragmento reutilizable de Alertas y Notificaciones -->
+    <div th:fragment="alertsFragment">
+        <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+            <div th:text="${successMsg}">Operación realizada con éxito.</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+            <div th:text="${errorMsg}">Ha ocurrido un error en la solicitud.</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${logoutMsg}" class="alert alert-info alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-info-circle-fill fs-5 me-2"></i>
+            <div th:text="${logoutMsg}">Sesión finalizada.</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+</body>
+</html>
+

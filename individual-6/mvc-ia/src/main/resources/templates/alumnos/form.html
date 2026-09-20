@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main-layout :: layout(~{::title}, 'alumnos', ~{::content})}">
+<head>
+    <title>Matricular Alumno • Sistema Escolar</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="mb-4">
+            <a th:href="@{/alumnos}" class="btn btn-sm btn-outline-secondary mb-2">
+                <i class="bi bi-arrow-left me-1"></i> Volver al listado
+            </a>
+            <h3 class="fw-bold mb-1">Matricular Nuevo Estudiante</h3>
+            <p class="text-muted mb-0">Complete la ficha de inscripción del alumno y asigne su aula correspondiente.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="card content-card p-4">
+                    <form th:action="@{/alumnos/guardar}" th:object="${alumno}" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label fw-semibold small">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="apellido" class="form-label fw-semibold small">Apellido <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="apellido" th:field="*{apellido}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="dni" class="form-label fw-semibold small">DNI <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="dni" th:field="*{dni}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-semibold small">Correo Institucional / Tutor <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="sexo" class="form-label fw-semibold small">Sexo <span class="text-danger">*</span></label>
+                                <select class="form-select" id="sexo" th:field="*{sexo}" required>
+                                    <option value="" disabled selected>Seleccione sexo...</option>
+                                    <option th:each="s : ${sexos}" th:value="${s}" th:text="${s.descripcion}"></option>
+                                </select>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="fechaNacimiento" class="form-label fw-semibold small">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fechaNacimiento" th:field="*{fechaNacimiento}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="codigo" class="form-label fw-semibold small">N° Matrícula / Código <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="codigo" th:field="*{codigo}" placeholder="Ej: 202405" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="fechaIngreso" class="form-label fw-semibold small">Fecha de Ingreso <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fechaIngreso" th:field="*{fechaIngreso}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fechaIngreso')}" th:errors="*{fechaIngreso}"></div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="aulaId" class="form-label fw-semibold small">Aula Asignada (Agregación) <span class="text-danger">*</span></label>
+                                <select class="form-select" id="aulaId" th:field="*{aulaId}" required>
+                                    <option value="" disabled selected>Seleccione Aula...</option>
+                                    <option th:each="a : ${aulas}" th:value="${a.id}" th:text="${a.nombreCompleto}"></option>
+                                </select>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('aulaId')}" th:errors="*{aulaId}"></div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a th:href="@{/alumnos}" class="btn btn-light">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check2 me-1"></i> Guardar Alumno
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

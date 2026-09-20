@@ -1,0 +1,177 @@
+:root {
+    --primary-color: #2c3e50;
+    --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    --accent-color: #0d6efd;
+    --sidebar-bg: #1f2937;
+    --sidebar-hover: #374151;
+    --sidebar-active: #3b82f6;
+    --bg-light: #f8fafc;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-light);
+    color: #334155;
+    min-height: 100vh;
+}
+
+/* SIDEBAR MODERNA ESTILO THEMEWAGON */
+.sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background-color: var(--sidebar-bg);
+    color: #f3f4f6;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar .brand {
+    padding: 1.5rem 1.25rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link {
+    color: #9ca3af;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    border-radius: 8px;
+    margin: 0.2rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar .nav-link:hover {
+    color: #ffffff;
+    background-color: var(--sidebar-hover);
+}
+
+.sidebar .nav-link.active {
+    color: #ffffff;
+    background: var(--primary-gradient);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+}
+
+.sidebar .nav-link i {
+    font-size: 1.15rem;
+}
+
+/* NAVBAR SUPERIOR */
+.top-navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.85rem 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* TARJETAS KPI DASHBOARD */
+.kpi-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.kpi-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* TARJETAS DE CONTENIDO */
+.content-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 1.5rem;
+}
+
+.content-card .card-header {
+    background: transparent;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.2rem 1.5rem;
+    font-weight: 600;
+}
+
+/* TABLAS ESTILIZADAS */
+.table-custom th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    background-color: #f8fafc;
+    border-top: none;
+}
+
+.table-custom td {
+    vertical-align: middle;
+    font-size: 0.92rem;
+}
+
+/* BADGES MODERNOS */
+.badge-soft-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-soft-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-soft-primary {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-soft-info {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+/* PANTALLA DE LOGIN Y REGISTRO */
+.auth-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: none;
+    overflow: hidden;
+}
+
+/* DIAGRAMA MERMAID */
+.mermaid-box {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    overflow-x: auto;
+}
+

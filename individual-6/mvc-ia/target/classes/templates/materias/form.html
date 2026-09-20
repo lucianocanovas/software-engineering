@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main-layout :: layout(~{::title}, 'materias', ~{::content})}">
+<head>
+    <title>Nueva Materia • Sistema Escolar</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="mb-4">
+            <a th:href="@{/materias}" class="btn btn-sm btn-outline-secondary mb-2">
+                <i class="bi bi-arrow-left me-1"></i> Volver al listado
+            </a>
+            <h3 class="fw-bold mb-1">Registrar Nueva Materia</h3>
+            <p class="text-muted mb-0">Incorpore una asignatura a la currícula del colegio.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7">
+                <div class="card content-card p-4">
+                    <form th:action="@{/materias/guardar}" th:object="${materia}" method="post">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="nombre" class="form-label fw-semibold small">Nombre de la Materia <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombre" th:field="*{nombre}" placeholder="Ej: Física Cuántica Básica" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="horas" class="form-label fw-semibold small">Carga Horaria Semanal <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="horas" th:field="*{horas}" min="1" max="20" placeholder="Ej: 4" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('horas')}" th:errors="*{horas}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="gradoId" class="form-label fw-semibold small">Grado Correspondiente <span class="text-danger">*</span></label>
+                                <select class="form-select" id="gradoId" th:field="*{gradoId}" required>
+                                    <option value="" disabled selected>Seleccione Grado...</option>
+                                    <option th:each="g : ${grados}" th:value="${g.id}" th:text="${g.nombreCompleto}"></option>
+                                </select>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('gradoId')}" th:errors="*{gradoId}"></div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="descripcion" class="form-label fw-semibold small">Descripción o Programa Analítico</label>
+                                <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="3" placeholder="Objetivos pedagógicos y temas principales..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a th:href="@{/materias}" class="btn btn-light">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check2 me-1"></i> Guardar Materia
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

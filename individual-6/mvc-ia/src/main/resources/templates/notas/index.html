@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main-layout :: layout(~{::title}, 'notas', ~{::content})}">
+<head>
+    <title>Evaluaciones y Calificaciones • Sistema Escolar</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Evaluaciones y Calificaciones</h3>
+                <p class="text-muted mb-0">Gestión de exámenes (Composición Evaluacion &rarr; Nota) y registro de notas de los alumnos.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/notas/nueva}" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Asentar Nueva Nota
+                </a>
+                <a th:href="@{/evaluaciones/nueva}" class="btn btn-outline-primary">
+                    <i class="bi bi-file-earmark-plus me-1"></i> Programar Evaluación
+                </a>
+            </div>
+        </div>
+
+        <!-- Fila con Evaluaciones Existentes -->
+        <div class="card content-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-journal-text text-primary me-2"></i> Evaluaciones Planificadas</span>
+                <span class="badge bg-secondary" th:text="${#lists.size(evaluaciones)} + ' Evaluaciones'">0</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Título de la Evaluación</th>
+                                <th>Tipo</th>
+                                <th>Materia</th>
+                                <th>Fecha</th>
+                                <th>Docente a Cargo</th>
+                                <th>Notas Registradas (Composición)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="e : ${evaluaciones}">
+                                <td class="fw-bold text-dark" th:text="${e.titulo}">Primer Parcial</td>
+                                <td>
+                                    <span class="badge badge-soft-primary" th:text="${e.tipo}">Examen Parcial</span>
+                                </td>
+                                <td th:text="${e.materiaNombre}">Matemáticas</td>
+                                <td th:text="${#temporals.format(e.fecha, 'dd/MM/yyyy')}">20/09/2026</td>
+                                <td th:text="${e.profesorNombre != null ? e.profesorNombre : '-'}">Docente</td>
+                                <td>
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" th:text="${e.cantidadNotas} + ' calificaciones'">0</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(evaluaciones)}">
+                                <td colspan="6" class="text-center py-4 text-muted">No se registran evaluaciones actualmente.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Calificaciones Detalladas -->
+        <div class="card content-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-award-fill text-warning me-2"></i> Registro de Calificaciones por Alumno</span>
+                <span class="badge bg-light text-dark border">
+                    Promedio General: <strong th:text="${promedioGeneral}">0.0</strong>
+                </span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Matrícula</th>
+                                <th>Evaluación</th>
+                                <th>Materia</th>
+                                <th>Fecha Registro</th>
+                                <th>Puntaje (0 - 10)</th>
+                                <th>Estado</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="n : ${notas}">
+                                <td class="fw-bold text-dark" th:text="${n.alumnoNombre}">Lucas Benítez</td>
+                                <td>
+                                    <span class="badge bg-light text-secondary border font-monospace" th:text="'#' + ${n.alumnoCodigo}">#202401</span>
+                                </td>
+                                <td th:text="${n.evaluacionTitulo}">Primer Parcial</td>
+                                <td class="text-muted small" th:text="${n.materiaNombre}">Matemáticas</td>
+                                <td th:text="${#temporals.format(n.fecha, 'dd/MM/yyyy')}">20/09/2026</td>
+                                <td>
+                                    <span class="fs-6 fw-bold" th:text="${n.puntaje}">8.5</span>
+                                </td>
+                                <td>
+                                    <span th:if="${n.aprobada}" class="badge badge-soft-success">
+                                        <i class="bi bi-check2 me-1"></i> Aprobado
+                                    </span>
+                                    <span th:unless="${n.aprobada}" class="badge badge-soft-danger">
+                                        <i class="bi bi-x-lg me-1"></i> Desaprobado
+                                    </span>
+                                </td>
+                                <td class="text-muted small" th:text="${n.observaciones != null and !n.observaciones.isEmpty() ? n.observaciones : '-'}">-</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(notas)}">
+                                <td colspan="8" class="text-center py-4 text-muted">No se han registrado notas aún.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

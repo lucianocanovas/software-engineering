@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main-layout :: layout(~{::title}, 'dashboard', ~{::content})}">
+<head>
+    <title>Panel Principal • Sistema Escolar</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- Encabezado de Bienvenida -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Bienvenido/a, <span th:text="${usuarioActual != null ? usuarioActual.nombreCompleto : 'Docente'}">Profesor</span></h3>
+                <p class="text-muted mb-0">Resumen general académico, métricas clave y accesos directos.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/notas/nueva}" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Calificar Alumno
+                </a>
+                <a th:href="@{/evaluaciones/nueva}" class="btn btn-outline-primary">
+                    <i class="bi bi-calendar-check me-1"></i> Nueva Evaluación
+                </a>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Métricas KPI (ThemeWagon Style) -->
+        <div class="row g-3 mb-4">
+            <!-- Total Alumnos -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card kpi-card p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Total Alumnos</div>
+                            <div class="fs-2 fw-bold text-dark mt-1" th:text="${totalAlumnos}">0</div>
+                            <span class="badge badge-soft-primary small mt-1">
+                                <i class="bi bi-mortarboard-fill me-1"></i> Matriculados
+                            </span>
+                        </div>
+                        <div class="kpi-icon-box bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Materias -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card kpi-card p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Materias Activas</div>
+                            <div class="fs-2 fw-bold text-dark mt-1" th:text="${totalMaterias}">0</div>
+                            <span class="badge badge-soft-info small mt-1">
+                                <i class="bi bi-book-fill me-1"></i> Currícula
+                            </span>
+                        </div>
+                        <div class="kpi-icon-box bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-journal-text"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Evaluaciones -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card kpi-card p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Evaluaciones</div>
+                            <div class="fs-2 fw-bold text-dark mt-1" th:text="${totalEvaluaciones}">0</div>
+                            <span class="badge badge-soft-success small mt-1">
+                                <i class="bi bi-check2-square me-1"></i> Programadas
+                            </span>
+                        </div>
+                        <div class="kpi-icon-box bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-clipboard2-check-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Promedio General -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card kpi-card p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-semibold text-uppercase">Promedio General</div>
+                            <div class="fs-2 fw-bold text-dark mt-1" th:text="${promedioGeneral}">0.0</div>
+                            <span class="badge badge-soft-success small mt-1" th:if="${promedioGeneral >= 6.0}">
+                                <i class="bi bi-graph-up-arrow me-1"></i> Rendimiento Óptimo
+                            </span>
+                            <span class="badge badge-soft-danger small mt-1" th:unless="${promedioGeneral >= 6.0}">
+                                <i class="bi bi-graph-down-arrow me-1"></i> Rendimiento Bajo
+                            </span>
+                        </div>
+                        <div class="kpi-icon-box bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Calificaciones Recientes -->
+            <div class="col-12 col-lg-7">
+                <div class="card content-card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-award-fill text-primary me-2"></i> Últimas Calificaciones Asentadas</span>
+                        <a th:href="@{/notas}" class="btn btn-sm btn-link text-decoration-none">Ver todas &rarr;</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Alumno</th>
+                                        <th>Evaluación</th>
+                                        <th>Materia</th>
+                                        <th>Puntaje</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="n : ${ultimasNotas}">
+                                        <td class="fw-semibold" th:text="${n.alumnoNombre}">Juan Pérez</td>
+                                        <td th:text="${n.evaluacionTitulo}">Parcial 1</td>
+                                        <td class="text-muted small" th:text="${n.materiaNombre}">Matemáticas</td>
+                                        <td class="fw-bold fs-6" th:text="${n.puntaje}">8.5</td>
+                                        <td>
+                                            <span th:if="${n.aprobada}" class="badge badge-soft-success">Aprobado</span>
+                                            <span th:unless="${n.aprobada}" class="badge badge-soft-danger">Desaprobado</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(ultimasNotas)}">
+                                        <td colspan="5" class="text-center text-muted py-4">No hay calificaciones registradas aún.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alumnos Registrados -->
+            <div class="col-12 col-lg-5">
+                <div class="card content-card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-person-check-fill text-info me-2"></i> Estudiantes Matriculados</span>
+                        <a th:href="@{/alumnos}" class="btn btn-sm btn-link text-decoration-none">Ver todos &rarr;</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li th:each="alu : ${alumnosRecientes}" class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <div class="fw-semibold text-dark" th:text="${alu.nombreCompleto}">Nombre Alumno</div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-door-closed me-1"></i><span th:text="${alu.aulaNombre}">1° A</span> | Mat: <span th:text="${alu.codigo}">202401</span>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="badge bg-light text-dark border">
+                                        Prom: <strong th:text="${alu.promedio}">8.0</strong>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banner Explicativo de Arquitectura y Relaciones UML -->
+        <div class="card content-card mt-4 border-start border-primary border-4 p-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <h5 class="fw-bold mb-1"><i class="bi bi-lightbulb-fill text-warning me-2"></i> Diseño Orientado a Objetos (Inciso a)</h5>
+                    <p class="text-muted mb-0">
+                        El sistema implementa de forma explícita las cuatro relaciones UML fundamentales: 
+                        <strong>Herencia</strong> (Persona &rarr; Profesor/Alumno), <strong>Composición</strong> (Colegio &rarr; Grado &rarr; Aula, Evaluación &rarr; Nota),
+                        <strong>Agregación</strong> (Aula &rarr; Alumnos) y <strong>Asociación</strong> (Profesor &harr; Materia, Alumno &harr; Nota).
+                    </p>
+                </div>
+                <a th:href="@{/docs/diagrama}" class="btn btn-outline-primary">
+                    <i class="bi bi-diagram-3-fill me-1"></i> Ver Diagrama Completo
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
