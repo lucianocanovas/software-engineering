@@ -1,0 +1,213 @@
+/* ==========================================================================
+   PLANTILLA TECNOLÓGICA BOOTSTRAP 5 (ESTILO THEMEWAGON)
+   TechStore Management System
+   ========================================================================== */
+
+:root {
+    --ts-primary: #4361ee;
+    --ts-primary-dark: #3a0ca3;
+    --ts-secondary: #4cc9f0;
+    --ts-dark: #1e293b;
+    --ts-darker: #0f172a;
+    --ts-light-bg: #f8fafc;
+    --ts-card-border: #e2e8f0;
+    --ts-sidebar-width: 260px;
+}
+
+body {
+    background-color: var(--ts-light-bg);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #334155;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR DE NAVEGACIÓN --- */
+.sidebar {
+    width: var(--ts-sidebar-width);
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    min-height: 100vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+.sidebar-brand {
+    padding: 1.5rem 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-brand:hover {
+    color: var(--ts-secondary);
+}
+
+.sidebar-menu {
+    padding: 1rem 0;
+    list-style: none;
+    margin: 0;
+}
+
+.sidebar-heading {
+    padding: 0.75rem 1.5rem 0.25rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    font-weight: 700;
+}
+
+.sidebar-item {
+    margin: 0.2rem 0.75rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 1rem;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.92rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-link.active {
+    color: #ffffff;
+    background: linear-gradient(90deg, var(--ts-primary) 0%, var(--ts-primary-dark) 100%);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.35);
+}
+
+.sidebar-link i {
+    font-size: 1.15rem;
+    width: 22px;
+    text-align: center;
+}
+
+/* --- CONTENIDO PRINCIPAL Y TOPBAR --- */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.topbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--ts-card-border);
+    padding: 0.75rem 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.content-body {
+    padding: 1.75rem;
+    flex: 1;
+}
+
+/* --- TARJETAS DASHBOARD Y COMPONENTES --- */
+.card-custom {
+    background-color: #ffffff;
+    border: 1px solid var(--ts-card-border);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-custom:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.card-kpi {
+    border-left: 4px solid var(--ts-primary);
+}
+
+.card-kpi.warning {
+    border-left-color: #f59e0b;
+}
+
+.card-kpi.success {
+    border-left-color: #10b981;
+}
+
+.card-kpi.info {
+    border-left-color: var(--ts-secondary);
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* --- TABLAS RESPONSIVAS --- */
+.table-custom {
+    margin-bottom: 0;
+}
+
+.table-custom th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--ts-card-border);
+    padding: 0.85rem 1rem;
+}
+
+.table-custom td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--ts-card-border);
+}
+
+/* --- BADGES Y ETIQUETAS --- */
+.badge-soft-primary {
+    background-color: rgba(67, 97, 238, 0.12);
+    color: var(--ts-primary);
+}
+
+.badge-soft-success {
+    background-color: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.badge-soft-warning {
+    background-color: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.badge-soft-danger {
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+}
+
+.badge-soft-info {
+    background-color: rgba(76, 201, 240, 0.15);
+    color: #0284c7;
+}
+
+/* --- FOOTER --- */
+.footer-custom {
+    background-color: #ffffff;
+    border-top: 1px solid var(--ts-card-border);
+    padding: 1rem 1.75rem;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+

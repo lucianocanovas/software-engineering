@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head(${tituloForm})}"></head>
+<body>
+
+<div class="d-flex">
+    <div th:replace="~{layout/fragments :: sidebar('productos')}"></div>
+
+    <div class="main-wrapper">
+        <header th:replace="~{layout/fragments :: topbar(${tituloForm}, 'Herencia UML: Especialización ProductoDigital (Software, Licencias y Distribución Web)')}"></header>
+
+        <main class="content-body">
+            <div th:replace="~{layout/fragments :: alerts}"></div>
+
+            <div class="row justify-content-center">
+                <div class="col-12 col-xl-9">
+                    <div class="card card-custom shadow-sm">
+                        <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <i class="bi bi-cloud-arrow-down text-info me-2"></i>Datos del Producto Digital (Software / Licencia)
+                            </h6>
+                            <span class="badge bg-info text-dark">Especialización ProductoDigital</span>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <form th:action="@{/productos/guardar}" th:object="${producto}" method="post" novalidate>
+                                <input type="hidden" th:field="*{id}">
+                                <input type="hidden" th:field="*{tipoProducto}" value="DIGITAL">
+
+                                <!-- SECCIÓN 1: ATRIBUTOS DE LA CLASE BASE (Producto) -->
+                                <h6 class="text-uppercase text-secondary small fw-bold mb-3 border-bottom pb-2">
+                                    <i class="bi bi-layers me-1"></i> 1. Atributos Generales (Clase Base Producto)
+                                </h6>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-4">
+                                        <label for="codigo" class="form-label fw-semibold">Código de Producto *</label>
+                                        <input type="text" id="codigo" th:field="*{codigo}" class="form-control"
+                                               th:classappend="${#fields.hasErrors('codigo') ? 'is-invalid' : ''}"
+                                               placeholder="Ej: PROD-SW-001" required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></div>
+                                    </div>
+
+                                    <div class="col-md-8">
+                                        <label for="nombre" class="form-label fw-semibold">Nombre del Software o Servicio *</label>
+                                        <input type="text" id="nombre" th:field="*{nombre}" class="form-control"
+                                               th:classappend="${#fields.hasErrors('nombre') ? 'is-invalid' : ''}"
+                                               placeholder="Ej: Antivirus Enterprise 2026 1 Usuario" required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="categoriaId" class="form-label fw-semibold">Categoría (Agregación UML) *</label>
+                                        <select id="categoriaId" th:field="*{categoriaId}" class="form-select"
+                                                th:classappend="${#fields.hasErrors('categoriaId') ? 'is-invalid' : ''}" required>
+                                            <option value="">-- Seleccione una Categoría --</option>
+                                            <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.nombre}"></option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('categoriaId')}" th:errors="*{categoriaId}"></div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="precioVenta" class="form-label fw-semibold">Precio de Venta Base ($) *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" step="0.01" min="0.01" id="precioVenta" th:field="*{precioVenta}" class="form-control"
+                                                   th:classappend="${#fields.hasErrors('precioVenta') ? 'is-invalid' : ''}" required>
+                                        </div>
+                                        <small class="text-muted">El precio final aplica 5% de descuento por distribución electrónica.</small>
+                                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('precioVenta')}" th:errors="*{precioVenta}"></div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label for="descripcion" class="form-label fw-semibold">Descripción del Software</label>
+                                        <textarea id="descripcion" th:field="*{descripcion}" rows="2" class="form-control"
+                                                  placeholder="Requisitos de sistema operativo, compatibilidad, funciones incluidas..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- SECCIÓN 2: ATRIBUTOS ESPECÍFICOS DE LA SUBCLASE (ProductoDigital) -->
+                                <h6 class="text-uppercase text-secondary small fw-bold mb-3 border-bottom pb-2">
+                                    <i class="bi bi-key me-1"></i> 2. Atributos Específicos de Distribución Digital y Licenciamiento
+                                </h6>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label for="claveLicencia" class="form-label fw-semibold">Clave de Activación / Licencia</label>
+                                        <div class="input-group">
+                                            <input type="text" id="claveLicencia" th:field="*{claveLicencia}" class="form-control font-monospace"
+                                                   placeholder="TECH-XXXX-XXXX-XXXX">
+                                            <button type="button" class="btn btn-outline-secondary" onclick="generarClaveAleatoria()">
+                                                <i class="bi bi-arrow-clockwise"></i> Generar
+                                            </button>
+                                        </div>
+                                        <small class="text-muted">Método generarClaveLicencia() del diagrama de clases.</small>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="vigenciaDias" class="form-label fw-semibold">Vigencia (Días)</label>
+                                        <input type="number" min="1" id="vigenciaDias" th:field="*{vigenciaDias}" class="form-control"
+                                               th:classappend="${#fields.hasErrors('vigenciaDias') ? 'is-invalid' : ''}">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="urlDescarga" class="form-label fw-semibold">URL de Descarga Oficial</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                            <input type="url" id="urlDescarga" th:field="*{urlDescarga}" class="form-control"
+                                                   placeholder="https://ejemplo.com/descarga/instalador.exe">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- BOTONES DE ACCIÓN -->
+                                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                                    <a th:href="@{/productos}" class="btn btn-outline-secondary">Cancelar</a>
+                                    <button type="submit" class="btn btn-info text-dark px-4 fw-bold">
+                                        <i class="bi bi-save me-1"></i> Guardar Producto Digital
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer th:replace="~{layout/fragments :: footer}"></footer>
+    </div>
+</div>
+
+<script>
+    function generarClaveAleatoria() {
+        const seg1 = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const seg2 = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const seg3 = Math.random().toString(36).substring(2, 6).toUpperCase();
+        document.getElementById('claveLicencia').value = 'TECH-' + seg1 + '-' + seg2 + '-' + seg3;
+    }
+</script>
+
+<div th:replace="~{layout/fragments :: scripts}"></div>
+</body>
+</html>
+

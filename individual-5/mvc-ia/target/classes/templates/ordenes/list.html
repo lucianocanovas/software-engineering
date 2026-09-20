@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Órdenes de Compra')}"></head>
+<body>
+
+<div class="d-flex">
+    <div th:replace="~{layout/fragments :: sidebar('ordenes')}"></div>
+
+    <div class="main-wrapper">
+        <header th:replace="~{layout/fragments :: topbar('Órdenes de Compra a Proveedores', 'Composición UML: Orden 1 contiene 1..* Detalles | Actualización de Stock en Recepción')}"></header>
+
+        <main class="content-body">
+            <div th:replace="~{layout/fragments :: alerts}"></div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="fw-bold mb-0 text-dark">Registro de Abastecimiento Mayorista</h5>
+                    <small class="text-muted">
+                        "estos se actualizan en el stock de la empresa por medio de compras a sus proveedores mayorista mediante el uso de órdenes de compra que registran el detalle de la misma."
+                    </small>
+                </div>
+                <a th:href="@{/ordenes/nueva}" class="btn btn-primary">
+                    <i class="bi bi-cart-plus me-1"></i> + Emitir Orden de Compra
+                </a>
+            </div>
+
+            <div class="card card-custom">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Fecha Emisión</th>
+                                    <th>Fecha Entrega Est.</th>
+                                    <th>Proveedor Mayorista</th>
+                                    <th>Responsable (Compras)</th>
+                                    <th>Renglones</th>
+                                    <th>Monto Total</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="o : ${ordenes}">
+                                    <td>
+                                        <code class="fw-bold text-dark fs-6" th:text="${o.numero}">OC-001</code>
+                                    </td>
+                                    <td class="small text-muted" th:text="${#temporals.format(o.fechaEmision, 'dd/MM/yyyy')}">01/01/2026</td>
+                                    <td class="small" th:text="${#temporals.format(o.fechaEntregaEstimada, 'dd/MM/yyyy')}">10/01/2026</td>
+                                    <td>
+                                        <strong class="text-dark" th:text="${o.proveedorRazonSocial}">Proveedor</strong>
+                                    </td>
+                                    <td class="small text-secondary" th:text="${o.encargadoComprasNombre}">Encargado</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border" th:text="${o.detalles.size()} + ' ítems'">0 ítems</span>
+                                    </td>
+                                    <td>
+                                        <strong class="text-primary fs-6" th:text="'$' + ${#numbers.formatDecimal(o.total, 1, 'POINT', 2, 'COMMA')}">$0.00</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${o.isPendiente() ? 'badge-soft-warning' : (o.isRecibida() ? 'badge-soft-success' : 'badge-soft-danger')}"
+                                              th:text="${o.estado.descripcion}">PENDIENTE</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a th:href="@{/ordenes/detalle/{id}(id=${o.id})}" class="btn btn-outline-secondary" title="Ver Detalle y Renglones">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <!-- Botón de Acción Principal: Confirmar Recepción (Actualiza Stock) -->
+                                            <form th:if="${o.isPendiente()}" th:action="@{/ordenes/confirmar/{id}(id=${o.id})}" method="post" class="d-inline"
+                                                  onsubmit="return confirm('¿Confirmar recepción física de mercadería? Esta acción incrementará el stock de los productos comprados.');">
+                                                <button type="submit" class="btn btn-success" title="Confirmar Recepción e Incrementar Stock">
+                                                    <i class="bi bi-box-arrow-in-down me-1"></i> Recibir
+                                                </button>
+                                            </form>
+                                            <form th:if="${o.isPendiente()}" th:action="@{/ordenes/cancelar/{id}(id=${o.id})}" method="post" class="d-inline"
+                                                  onsubmit="return confirm('¿Desea cancelar esta orden de compra?');">
+                                                <button type="submit" class="btn btn-outline-danger" title="Cancelar Orden">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${ordenes.isEmpty()}">
+                                    <td colspan="9" class="text-center py-5 text-muted">
+                                        No hay órdenes de compra registradas.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer th:replace="~{layout/fragments :: footer}"></footer>
+    </div>
+</div>
+
+<div th:replace="~{layout/fragments :: scripts}"></div>
+</body>
+</html>
+

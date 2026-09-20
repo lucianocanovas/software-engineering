@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Catálogo de Productos')}"></head>
+<body>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div th:replace="~{layout/fragments :: sidebar('productos')}"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <header th:replace="~{layout/fragments :: topbar('Catálogo de Productos Tecnológicos', 'Gestión polimórfica de hardware, software y licencias')}"></header>
+
+        <main class="content-body">
+            <!-- Flash Messages -->
+            <div th:replace="~{layout/fragments :: alerts}"></div>
+
+            <!-- BARRA DE HERRAMIENTAS: BÚSQUEDA Y BOTONES DE ALTA -->
+            <div class="card card-custom mb-4 p-3 bg-white">
+                <div class="row g-3 align-items-center justify-content-between">
+                    <!-- Formulario de Filtros -->
+                    <div class="col-12 col-md-7">
+                        <form th:action="@{/productos}" method="get" class="row g-2">
+                            <div class="col-sm-7">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                    <input type="text" name="filtro" th:value="${filtroActual}" class="form-control border-start-0" placeholder="Buscar por código o nombre...">
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <select name="categoriaId" class="form-select" onchange="this.form.submit()">
+                                    <option value="">Todas las Categorías</option>
+                                    <option th:each="c : ${categorias}"
+                                            th:value="${c.id}"
+                                            th:text="${c.nombre}"
+                                            th:selected="${c.id == categoriaSeleccionada}">Categoría</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Botones de Alta con Herencia -->
+                    <div class="col-12 col-md-5 text-md-end">
+                        <div class="btn-group">
+                            <a th:href="@{/productos/nuevo/fisico}" class="btn btn-primary">
+                                <i class="bi bi-box-seam me-1"></i> + Producto Físico
+                            </a>
+                            <a th:href="@{/productos/nuevo/digital}" class="btn btn-secondary">
+                                <i class="bi bi-cloud-arrow-down me-1"></i> + Producto Digital
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA DE PRODUCTOS -->
+            <div class="card card-custom">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-dark">
+                        <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Listado de Productos Registrados
+                    </h6>
+                    <span class="badge bg-light text-secondary border" th:text="${productos.size()} + ' encontrados'">0 encontrados</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre del Producto</th>
+                                    <th>Tipo</th>
+                                    <th>Categoría</th>
+                                    <th>Stock</th>
+                                    <th>Precio Base</th>
+                                    <th>Precio Final</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${productos}">
+                                    <td>
+                                        <code class="fw-bold text-primary" th:text="${p.codigo}">PROD-001</code>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-dark" th:text="${p.nombre}">Nombre del Producto</div>
+                                        <small class="text-muted" th:text="${p.descripcion != null && p.descripcion.length() > 60 ? #strings.substring(p.descripcion, 0, 60) + '...' : p.descripcion}">Descripción</small>
+                                    </td>
+                                    <td>
+                                        <span th:if="${p.esFisico()}" class="badge badge-soft-primary">
+                                            <i class="bi bi-box me-1"></i> Físico (Hardware)
+                                        </span>
+                                        <span th:if="${p.esDigital()}" class="badge badge-soft-info">
+                                            <i class="bi bi-key me-1"></i> Digital (Software)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border" th:text="${p.categoriaNombre != null ? p.categoriaNombre : 'Sin Categoría'}">Categoría</span>
+                                    </td>
+                                    <td>
+                                        <div th:if="${p.esFisico()}">
+                                            <span class="badge" th:classappend="${p.bajoStock ? 'bg-danger' : 'bg-success'}" th:text="${p.stock} + ' un.'">0 un.</span>
+                                            <div th:if="${p.bajoStock}" class="text-danger small mt-1" style="font-size: 0.7rem;">
+                                                <i class="bi bi-exclamation-triangle"></i> Mín: <span th:text="${p.stockMinimo}">5</span>
+                                            </div>
+                                        </div>
+                                        <span th:if="${p.esDigital()}" class="badge bg-light text-muted border">
+                                            <i class="bi bi-infinity"></i> Licencia Ilimitada
+                                        </span>
+                                    </td>
+                                    <td class="text-secondary" th:text="'$' + ${#numbers.formatDecimal(p.precioVenta, 1, 'POINT', 2, 'COMMA')}">$0.00</td>
+                                    <td>
+                                        <strong class="text-success" th:text="'$' + ${#numbers.formatDecimal(p.precioFinal, 1, 'POINT', 2, 'COMMA')}">$0.00</strong>
+                                        <div class="text-muted" style="font-size: 0.7rem;" th:text="${p.esFisico() ? '+3% embalaje' : '-5% desc. digital'}">Cálculo</div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a th:href="@{/productos/detalle/{id}(id=${p.id})}" class="btn btn-outline-secondary" title="Ficha Técnica">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a th:href="@{/productos/editar/{id}(id=${p.id})}" class="btn btn-outline-primary" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form th:action="@{/productos/eliminar/{id}(id=${p.id})}" method="post" class="d-inline"
+                                                  onsubmit="return confirm('¿Está seguro de que desea dar de baja este producto?');">
+                                                <button type="submit" class="btn btn-outline-danger" title="Baja Lógica">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${productos.isEmpty()}">
+                                    <td colspan="8" class="text-center py-5 text-muted">
+                                        <i class="bi bi-search text-secondary fs-3 d-block mb-2"></i>
+                                        No se encontraron productos que coincidan con los criterios de búsqueda.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer th:replace="~{layout/fragments :: footer}"></footer>
+    </div>
+</div>
+
+<div th:replace="~{layout/fragments :: scripts}"></div>
+</body>
+</html>
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- FRAGMENTO: HEAD -->
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle + ' | TechStore MVC'}">TechStore MVC</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Estilo personalizado ThemeWagon Adaptado -->
+    <link rel="stylesheet" th:href="@{/css/custom-theme.css}">
+</head>
+
+<!-- FRAGMENTO: SIDEBAR -->
+<nav th:fragment="sidebar(activeSection)" class="sidebar d-flex flex-column flex-shrink-0">
+    <a th:href="@{/dashboard}" class="sidebar-brand">
+        <i class="bi bi-cpu-fill text-info fs-3"></i>
+        <span>TechStore <span class="badge bg-primary fs-7">MVC</span></span>
+    </a>
+
+    <ul class="sidebar-menu flex-grow-1">
+        <li class="sidebar-heading">Principal</li>
+        <li class="sidebar-item">
+            <a th:href="@{/dashboard}" class="sidebar-link" th:classappend="${activeSection == 'dashboard' ? 'active' : ''}">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="sidebar-heading">Catálogo de Productos</li>
+        <li class="sidebar-item">
+            <a th:href="@{/productos}" class="sidebar-link" th:classappend="${activeSection == 'productos' ? 'active' : ''}">
+                <i class="bi bi-laptop"></i>
+                <span>Productos (ABM)</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a th:href="@{/categorias}" class="sidebar-link" th:classappend="${activeSection == 'categorias' ? 'active' : ''}">
+                <i class="bi bi-folder2-open"></i>
+                <span>Categorías</span>
+                <span class="badge bg-secondary ms-auto small">Agregación</span>
+            </a>
+        </li>
+
+        <li class="sidebar-heading">Abastecimiento y Stock</li>
+        <li class="sidebar-item">
+            <a th:href="@{/proveedores}" class="sidebar-link" th:classappend="${activeSection == 'proveedores' ? 'active' : ''}">
+                <i class="bi bi-buildings"></i>
+                <span>Proveedores</span>
+                <span class="badge bg-secondary ms-auto small">Asociación</span>
+            </a>
+        </li>
+        <li class="sidebar-item">
+            <a th:href="@{/ordenes}" class="sidebar-link" th:classappend="${activeSection == 'ordenes' ? 'active' : ''}">
+                <i class="bi bi-cart-check"></i>
+                <span>Órdenes de Compra</span>
+                <span class="badge bg-info ms-auto text-dark small">Composición</span>
+            </a>
+        </li>
+
+        <li class="sidebar-heading">Arquitectura y Diseño</li>
+        <li class="sidebar-item">
+            <a th:href="@{/docs/diagramas}" class="sidebar-link" th:classappend="${activeSection == 'docs' ? 'active' : ''}">
+                <i class="bi bi-diagram-3"></i>
+                <span>Diagramas UML</span>
+                <span class="badge bg-success ms-auto small">Secuencia</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Footer del Sidebar con info de usuario autenticado -->
+    <div class="p-3 border-top border-secondary border-opacity-25" th:if="${session.usuarioLogueado != null}">
+        <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">
+                <span th:text="${#strings.substring(session.usuarioLogueado.nombre,0,1)}">U</span>
+            </div>
+            <div class="overflow-hidden">
+                <div class="text-white small fw-bold text-truncate" th:text="${session.usuarioLogueado.nombreCompleto}">Usuario</div>
+                <div class="text-secondary" style="font-size: 0.75rem;">
+                    <span class="badge bg-light text-dark" th:text="${session.usuarioLogueado.rol}">ROL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- FRAGMENTO: TOPBAR -->
+<header th:fragment="topbar(pageHeading, pageSubheading)" class="topbar d-flex justify-content-between align-items-center">
+    <div>
+        <h4 class="mb-0 fw-bold text-dark" th:text="${pageHeading}">Título de Página</h4>
+        <small class="text-muted" th:text="${pageSubheading}">Subtítulo descriptivo</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <div class="d-none d-md-flex align-items-center gap-2 border rounded-pill px-3 py-1 bg-light">
+            <i class="bi bi-database-check text-success"></i>
+            <span class="small text-secondary">Base: <strong>SQLite (ORM JPA)</strong></span>
+        </div>
+        <div class="d-none d-md-flex align-items-center gap-2 border rounded-pill px-3 py-1 bg-light">
+            <i class="bi bi-shield-lock-check text-primary"></i>
+            <span class="small text-secondary">Capa: <strong>DTOs Activos</strong></span>
+        </div>
+
+        <div class="dropdown" th:if="${session.usuarioLogueado != null}">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle fs-5"></i>
+                <span th:text="${session.usuarioLogueado.nombreUsuario}">admin</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li><h6 class="dropdown-header" th:text="'Rol: ' + ${session.usuarioLogueado.rol}">Rol</h6></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item text-danger d-flex align-items-center gap-2" th:href="@{/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<!-- FRAGMENTO: ALERTAS FLASH -->
+<div th:fragment="alerts" class="mb-3">
+    <div th:if="${mensajeExito != null}" class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <div th:text="${mensajeExito}">Operación exitosa</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+
+    <div th:if="${mensajeError != null}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div th:text="${mensajeError}">Ocurrió un error</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+
+    <div th:if="${mensajeInfo != null}" class="alert alert-info alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-info-circle-fill fs-5"></i>
+        <div th:text="${mensajeInfo}">Información del sistema</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+
+    <div th:if="${mensajeAlerta != null}" class="alert alert-warning alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-shield-exclamation fs-5"></i>
+        <div th:text="${mensajeAlerta}">Atención requerida</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+</div>
+
+<!-- FRAGMENTO: FOOTER -->
+<footer th:fragment="footer" class="footer-custom mt-auto">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+        <span>&copy; 2026 <strong>TechStore MVC</strong> - Sistema Empresarial de Gestión Tecnológica</span>
+        <div class="d-flex gap-2">
+            <span class="badge bg-light text-dark border">Spring Boot 3.5.6</span>
+            <span class="badge bg-light text-dark border">Thymeleaf MVC</span>
+            <span class="badge bg-light text-dark border">SQLite + Hibernate</span>
+            <span class="badge bg-light text-dark border">Capa DTO</span>
+            <span class="badge bg-light text-dark border">Bootstrap 5</span>
+        </div>
+    </div>
+</footer>
+
+<!-- FRAGMENTO: SCRIPTS -->
+<div th:fragment="scripts">
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+</html>
+

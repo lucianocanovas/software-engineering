@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: head('Dashboard')}"></head>
+<body>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div th:replace="~{layout/fragments :: sidebar('dashboard')}"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Topbar -->
+        <header th:replace="~{layout/fragments :: topbar('Panel de Control', 'Resumen ejecutivo del inventario y compras mayoristas')}"></header>
+
+        <!-- Content Body -->
+        <main class="content-body">
+            <!-- Flash Messages -->
+            <div th:replace="~{layout/fragments :: alerts}"></div>
+
+            <!-- FILA DE TARJETAS KPI (METRICAS CLAVE) -->
+            <div class="row g-3 mb-4">
+                <!-- KPI: Total Productos -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card card-custom card-kpi p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-semibold text-uppercase">Productos Activos</span>
+                                <h3 class="fw-bold mb-0 text-dark mt-1" th:text="${totalProductos}">0</h3>
+                                <small class="text-primary"><i class="bi bi-diagram-2 me-1"></i>Físicos y Digitales</small>
+                            </div>
+                            <div class="kpi-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-laptop"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI: Bajo Stock -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card card-custom card-kpi warning p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-semibold text-uppercase">Bajo Stock</span>
+                                <h3 class="fw-bold mb-0 text-warning mt-1" th:text="${productosBajoStock.size()}">0</h3>
+                                <small class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>Requiere Compra</small>
+                            </div>
+                            <div class="kpi-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI: Órdenes Pendientes -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card card-custom card-kpi info p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-semibold text-uppercase">Órdenes Pendientes</span>
+                                <h3 class="fw-bold mb-0 text-info mt-1" th:text="${ordenesPendientes}">0</h3>
+                                <small class="text-muted"><i class="bi bi-truck me-1"></i>En tránsito mayorista</small>
+                            </div>
+                            <div class="kpi-icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-cart-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI: Proveedores -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card card-custom card-kpi success p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-muted small fw-semibold text-uppercase">Proveedores</span>
+                                <h3 class="fw-bold mb-0 text-success mt-1" th:text="${totalProveedores}">0</h3>
+                                <small class="text-success"><i class="bi bi-building-check me-1"></i>Distribuidores B2B</small>
+                            </div>
+                            <div class="kpi-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-buildings"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCIONES RÁPIDAS -->
+            <div class="card card-custom mb-4 p-3 bg-white">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-lightning-charge-fill text-warning fs-5"></i>
+                        <strong class="text-dark">Acciones Rápidas:</strong>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a th:href="@{/productos/nuevo/fisico}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i> + Producto Físico
+                        </a>
+                        <a th:href="@{/productos/nuevo/digital}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-plus-circle me-1"></i> + Producto Digital
+                        </a>
+                        <a th:href="@{/ordenes/nueva}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-cart-plus me-1"></i> + Emitir Orden de Compra
+                        </a>
+                        <a th:href="@{/proveedores/nuevo}" class="btn btn-sm btn-outline-dark">
+                            <i class="bi bi-building-add me-1"></i> + Proveedor Mayorista
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: ALERTA DE STOCK Y ÚLTIMAS ÓRDENES -->
+            <div class="row g-3">
+                <!-- Tabla Alertas de Stock -->
+                <div class="col-12 col-lg-5">
+                    <div class="card card-custom h-100">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <i class="bi bi-bell text-warning me-2"></i>Alertas de Inventario Físico
+                            </h6>
+                            <span class="badge bg-warning text-dark" th:text="${productosBajoStock.size()} + ' Críticos'">0</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-custom table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Stock Actual</th>
+                                            <th>Mínimo</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="p : ${productosBajoStock}">
+                                            <td>
+                                                <div class="fw-semibold" th:text="${p.nombre}">Nombre</div>
+                                                <small class="text-muted" th:text="${p.codigo}">COD</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-danger fs-7" th:text="${p.stock}">0</span>
+                                            </td>
+                                            <td class="text-muted small" th:text="${p.stockMinimo}">5</td>
+                                            <td>
+                                                <a th:href="@{/ordenes/nueva}" class="btn btn-sm btn-outline-primary" title="Comprar a proveedor">
+                                                    <i class="bi bi-cart-plus"></i> Reabastecer
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${productosBajoStock.isEmpty()}">
+                                            <td colspan="4" class="text-center py-4 text-muted">
+                                                <i class="bi bi-check2-circle text-success fs-4 d-block mb-1"></i>
+                                                Todos los productos físicos poseen stock suficiente.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla Órdenes de Compra Recientes -->
+                <div class="col-12 col-lg-7">
+                    <div class="card card-custom h-100">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <i class="bi bi-receipt text-primary me-2"></i>Órdenes de Compra Recientes
+                            </h6>
+                            <a th:href="@{/ordenes}" class="btn btn-sm btn-link text-decoration-none">Ver todas &rarr;</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-custom table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Número</th>
+                                            <th>Proveedor</th>
+                                            <th>Entrega Est.</th>
+                                            <th>Total</th>
+                                            <th>Estado</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="o : ${ultimasOrdenes}">
+                                            <td>
+                                                <strong th:text="${o.numero}">OC-001</strong>
+                                            </td>
+                                            <td th:text="${o.proveedorRazonSocial}">Proveedor</td>
+                                            <td class="small" th:text="${#temporals.format(o.fechaEntregaEstimada, 'dd/MM/yyyy')}">01/01/2026</td>
+                                            <td class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(o.total, 1, 'POINT', 2, 'COMMA')}">$0.00</td>
+                                            <td>
+                                                <span class="badge"
+                                                      th:classappend="${o.isPendiente() ? 'badge-soft-warning' : (o.isRecibida() ? 'badge-soft-success' : 'badge-soft-danger')}"
+                                                      th:text="${o.estado.descripcion}">Estado</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a th:href="@{/ordenes/detalle/{id}(id=${o.id})}" class="btn btn-outline-secondary" title="Ver Detalle">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <form th:if="${o.isPendiente()}" th:action="@{/ordenes/confirmar/{id}(id=${o.id})}" method="post" class="d-inline">
+                                                        <button type="submit" class="btn btn-success" title="Confirmar recepción y actualizar stock">
+                                                            <i class="bi bi-box-arrow-in-down"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${ultimasOrdenes.isEmpty()}">
+                                            <td colspan="6" class="text-center py-4 text-muted">
+                                                No hay órdenes de compra registradas.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BANNER EXPLICATIVO ARQUITECTURA -->
+            <div class="card card-custom mt-4 bg-light border-0">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-9">
+                            <h5 class="fw-bold text-dark mb-1">
+                                <i class="bi bi-info-circle-fill text-primary me-2"></i>Cumplimiento del Ejercicio 'a' & Arquitectura MVC
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                Los datos que circulan entre los Controladores y Vistas utilizan exclusivamente <strong>DTOs</strong>.
+                                La persistencia se realiza en <strong>SQLite</strong> mediante Spring Data JPA. El stock de hardware se actualiza
+                                al confirmar la recepción de órdenes de compra con proveedores mayoristas (Composición con Detalles y Asociación con Productos).
+                            </p>
+                        </div>
+                        <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                            <a th:href="@{/docs/diagramas}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-diagram-3 me-1"></i> Ver Diagrama de Secuencia & UML
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{layout/fragments :: footer}"></footer>
+    </div>
+</div>
+
+<div th:replace="~{layout/fragments :: scripts}"></div>
+</body>
+</html>
+
