@@ -7,23 +7,6 @@ interface ContactCardProps {
   clickHandler: (id: string) => void;
 }
 
-/**
- * =============================================================================
- * COMPONENTE: ContactCard
- * =============================================================================
- * CONCEPTOS TEÓRICOS EN REACT:
- * 1. PROPS (Propiedades):
- *    Permite pasar información de padres a hijos en una arquitectura de flujo
- *    unidireccional de datos (Unidirectional Data Flow). ContactCard recibe
- *    el objeto de contacto y la función `clickHandler` para notificar la eliminación.
- *
- * 2. DESESTRUCTURACIÓN (Destructuring):
- *    Extrae las propiedades `id`, `name` y `email` de forma limpia y legible.
- *
- * 3. PASO DE ARGUMENTOS EN HANDLERS:
- *    Se utiliza una función flecha anónima `() => clickHandler(id)` para evitar
- *    que la función se ejecute inmediatamente al renderizar el componente.
- */
 const ContactCard: React.FC<ContactCardProps> = ({ contact, clickHandler }) => {
   const { id, name, email } = contact;
 

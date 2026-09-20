@@ -8,25 +8,6 @@ interface ContactListProps {
   getContactId: (id: string) => void;
 }
 
-/**
- * =============================================================================
- * COMPONENTE: ContactList
- * =============================================================================
- * CONCEPTOS TEÓRICOS EN REACT:
- * 1. RENDERIZADO DE LISTAS (.map()):
- *    En React, las colecciones de datos se transforman en elementos JSX utilizando
- *    el método funcional `.map()`.
- *
- * 2. PROP "key" Y ALGORITMO DE RECONCILIACIÓN:
- *    Cada elemento generado en un bucle o lista DEBE tener una propiedad `key` única
- *    (en este caso, `contact.id`). Esto le permite al motor del Virtual DOM identificar
- *    con precisión qué elementos fueron modificados, agregados o eliminados sin necesidad
- *    de re-renderizar todo el árbol del DOM, maximizando el rendimiento.
- *
- * 3. BÚSQUEDA Y FILTRADO REACTIVO:
- *    Permite filtrar la lista de contactos en tiempo real mediante un input de búsqueda
- *    (funcionalidad avanzada explicada en la guía audiovisual de Dipesh Malvia).
- */
 const ContactList: React.FC<ContactListProps> = ({ contacts, getContactId }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 

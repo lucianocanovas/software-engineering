@@ -6,26 +6,6 @@ interface AddContactProps {
   addContactHandler: (contact: Omit<Contact, "id">) => void;
 }
 
-/**
- * =============================================================================
- * COMPONENTE: AddContact
- * =============================================================================
- * CONCEPTOS TEÓRICOS EN REACT:
- * 1. COMPONENTE CONTROLADO (Controlled Component):
- *    Los inputs del formulario tienen su valor vinculado directamente al estado
- *    de React (value={name}), y cada modificación dispara onChange actualizando
- *    el estado. De esta forma, React es la "única fuente de la verdad" (single
- *    source of truth).
- *
- * 2. ELEVACIÓN DEL ESTADO (Lifting State Up):
- *    AddContact no gestiona la lista global de contactos; en su lugar, recibe
- *    por props la función callback `addContactHandler`. Al procesar el envío,
- *    invoca esta función comunicando los nuevos datos hacia el componente padre (App).
- *
- * 3. EVENTOS SINTÉTICOS:
- *    `e.preventDefault()` previene la recarga automática predeterminada de la
- *    página web al enviar un formulario HTML tradicional.
- */
 const AddContact: React.FC<AddContactProps> = ({ addContactHandler }) => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
