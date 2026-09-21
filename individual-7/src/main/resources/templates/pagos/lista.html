@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title>Historial de Pagos</title>
+</head>
+<body>
+<div id="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Historial de Pagos y Cobranzas</h3>
+            <p class="text-muted small mb-0">Registro contable de recibos emitidos con Efectivo, Transferencia y Mercado Pago</p>
+        </div>
+        <a th:href="@{/cuotas}" class="btn btn-primary shadow-sm d-flex align-items-center gap-1">
+            <i class="bi bi-credit-card"></i> Cobrar Cuota Pendiente
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>N° Recibo</th>
+                            <th>Fecha y Hora</th>
+                            <th>Socio Titular</th>
+                            <th>Periodo</th>
+                            <th>Medio de Cobro</th>
+                            <th>Detalle Transaccional</th>
+                            <th>Monto Total</th>
+                            <th>Estado</th>
+                            <th class="text-end pe-3">Comprobante</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(pagos)}">
+                            <td colspan="9" class="text-center text-muted py-4">No hay pagos registrados aún en el sistema.</td>
+                        </tr>
+                        <tr th:each="p : ${pagos}">
+                            <td><code class="fw-bold text-dark" th:text="${p.numeroRecibo}">REC-01</code></td>
+                            <td class="small" th:text="${#temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm')}">20/09/2026</td>
+                            <td>
+                                <div class="fw-bold" th:text="${p.socioTitularNombre}">Socio</div>
+                                <div class="text-muted small" th:text="'N° ' + ${p.socioNumero}">SOC-01</div>
+                            </td>
+                            <td><span class="badge bg-secondary" th:text="${p.cuotaPeriodo}">2026-09</span></td>
+                            <td>
+                                <span th:if="${p.tipoMedioPago.name() == 'EFECTIVO'}" class="badge bg-success-subtle text-success border border-success">
+                                    <i class="bi bi-cash"></i> Efectivo
+                                </span>
+                                <span th:if="${p.tipoMedioPago.name() == 'TRANSFERENCIA'}" class="badge bg-primary-subtle text-primary border border-primary">
+                                    <i class="bi bi-bank"></i> Transferencia
+                                </span>
+                                <span th:if="${p.tipoMedioPago.name() == 'MERCADO_PAGO'}" class="badge bg-info-subtle text-info border border-info">
+                                    <i class="bi bi-qr-code"></i> Mercado Pago
+                                </span>
+                            </td>
+                            <td class="small text-muted" th:text="${p.detalleMedioPago}">Detalle</td>
+                            <td><strong class="text-success fs-6" th:text="'$' + ${#numbers.formatDecimal(p.montoAbonado, 1, 'COMMA', 2, 'POINT')}">$0.00</strong></td>
+                            <td><span class="badge bg-success" th:text="${p.estado}">COMPLETADO</span></td>
+                            <td class="text-end pe-3">
+                                <a th:href="@{/pagos/recibo/{id}(id=${p.id})}" class="btn btn-sm btn-outline-secondary" title="Ver Recibo Oficial">
+                                    <i class="bi bi-printer"></i> Recibo
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

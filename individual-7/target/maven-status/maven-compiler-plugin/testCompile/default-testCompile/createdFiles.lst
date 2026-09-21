@@ -1,0 +1,6 @@
+com\clubdeportivo\domain\PersonaDomainTest.class
+com\clubdeportivo\domain\SocioDomainTest.class
+com\clubdeportivo\service\PagoServiceImplTest.class
+com\clubdeportivo\domain\CuotaDomainTest.class
+com\clubdeportivo\ClubDeportivoIntegrationTest.class
+com\clubdeportivo\service\ControlAccesoServiceImplTest.class

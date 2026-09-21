@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title>Grupos Familiares</title>
+</head>
+<body>
+<div id="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Grupos Familiares (Agregación UML)</h3>
+            <p class="text-muted small mb-0">Gestión de suscripciones unificadas compuestas por Socio Titular y Familiares Adherentes</p>
+        </div>
+        <a th:href="@{/socios/nuevo}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-person-plus-fill"></i> Crear Socio y Nuevo Grupo
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>Código Grupo</th>
+                            <th>Socio Titular (Cabeza de Familia)</th>
+                            <th>DNI Titular</th>
+                            <th>Miembros Integrantes</th>
+                            <th>Fecha Creación</th>
+                            <th>Estado Cuota Titular</th>
+                            <th class="text-end pe-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(grupos)}">
+                            <td colspan="7" class="text-center text-muted py-4">No hay grupos familiares registrados actualmente.</td>
+                        </tr>
+                        <tr th:each="g : ${grupos}">
+                            <td><strong class="text-primary" th:text="${g.codigo}">GF-001</strong></td>
+                            <td>
+                                <div class="fw-bold" th:text="${g.titularNombre}">Nombre Titular</div>
+                                <div class="text-muted small" th:text="'N° Socio: ' + ${g.titularNumeroSocio}">SOC-001</div>
+                            </td>
+                            <td th:text="${g.titularDni}">12345678</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1">
+                                    <i class="bi bi-people-fill"></i> <span th:text="${g.cantidadTotalIntegrantes}">1</span> miembros
+                                </span>
+                            </td>
+                            <td class="small" th:text="${#temporals.format(g.fechaCreacion, 'dd/MM/yyyy')}">01/01/2026</td>
+                            <td>
+                                <span th:if="${g.titularAlDia}" class="badge bg-success-subtle text-success">
+                                    <i class="bi bi-check-circle"></i> Al Día
+                                </span>
+                                <span th:unless="${g.titularAlDia}" class="badge bg-danger-subtle text-danger">
+                                    <i class="bi bi-exclamation-octagon"></i> Con Deuda
+                                </span>
+                            </td>
+                            <td class="text-end pe-3">
+                                <a th:href="@{/familias/{id}(id=${g.id})}" class="btn btn-sm btn-outline-primary" title="Ver Grupo y Miembros">
+                                    <i class="bi bi-eye"></i> Ver Grupo
+                                </a>
+                                <a th:href="@{/socios/{id}(id=${g.titularId})}" class="btn btn-sm btn-outline-secondary" title="Ver Perfil Socio">
+                                    <i class="bi bi-person"></i> Socio
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

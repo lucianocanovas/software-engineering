@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title th:text="'Recibo Oficial N° ' + ${pago.numeroRecibo}">Recibo Oficial de Pago</title>
+</head>
+<body>
+<div id="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Recibo Oficial de Cobranza</h3>
+            <p class="text-muted small mb-0">Comprobante de cancelación de arancel social emitido por la Tesorería del Club</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
+                <i class="bi bi-printer-fill"></i> Imprimir Recibo
+            </button>
+            <a th:href="@{/pagos}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Historial de Pagos
+            </a>
+            <a th:href="@{/dashboard}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- RECIBO FORMATEADO (APTO IMPRESIÓN) -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <div class="card shadow border-2 p-4 p-md-5 bg-white" id="reciboImprimible">
+                <!-- ENCABEZADO INSTITUCIONAL -->
+                <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-shield-shaded display-4 text-primary"></i>
+                        <div>
+                            <h2 class="fw-bold text-dark mb-0">CLUB DEPORTIVO</h2>
+                            <span class="text-muted small">Personería Jurídica N° 4589/26 &bull; CUIT: 30-71452890-8</span>
+                            <div class="small text-muted">Av. del Deporte 1900 - Buenos Aires, Argentina</div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 fs-6 mb-2">PAGO ACREDITADO</span>
+                        <h5 class="fw-bold text-primary mb-0" th:text="${pago.numeroRecibo}">REC-2026-0001</h5>
+                        <small class="text-muted" th:text="'Fecha: ' + ${#temporals.format(pago.fechaPago, 'dd/MM/yyyy HH:mm:ss')}">20/09/2026 10:30</small>
+                    </div>
+                </div>
+
+                <!-- DATOS DEL SOCIO Y GRUPO FAMILIAR -->
+                <div class="row g-3 mb-4 bg-light rounded p-3">
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block">Socio Titular:</span>
+                        <strong class="fs-6 text-dark" th:text="${pago.socioTitularNombre}">Carlos Gómez</strong>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="text-muted small d-block">Número de Socio:</span>
+                        <strong class="text-primary" th:text="${pago.socioNumero}">SOC-1001</strong>
+                    </div>
+                    <div class="col-md-3">
+                        <span class="text-muted small d-block">Periodo Abonado:</span>
+                        <strong class="badge bg-dark fs-6" th:text="${pago.cuotaPeriodo}">2026-09</strong>
+                    </div>
+                </div>
+
+                <!-- DESGLOSE FINANCIERO -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-secondary small text-uppercase">
+                            <tr>
+                                <th>Concepto Facturado</th>
+                                <th>Medio de Cobro Empleado</th>
+                                <th class="text-end">Monto Cancelado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">Cuota Social Mensual - Cobertura Grupo Familiar</div>
+                                    <div class="small text-muted" th:text="'Correspondiente al periodo ' + ${pago.cuotaPeriodo}">Periodo</div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">
+                                        <span th:if="${pago.tipoMedioPago.name() == 'EFECTIVO'}" class="badge bg-success-subtle text-success">
+                                            <i class="bi bi-cash"></i> EFECTIVO
+                                        </span>
+                                        <span th:if="${pago.tipoMedioPago.name() == 'TRANSFERENCIA'}" class="badge bg-primary-subtle text-primary">
+                                            <i class="bi bi-bank"></i> TRANSFERENCIA BANCARIA
+                                        </span>
+                                        <span th:if="${pago.tipoMedioPago.name() == 'MERCADO_PAGO'}" class="badge bg-info-subtle text-info">
+                                            <i class="bi bi-qr-code"></i> MERCADO PAGO
+                                        </span>
+                                    </div>
+                                    <div class="small text-muted mt-1" th:text="${pago.detalleMedioPago}">Detalle transaccional</div>
+                                </td>
+                                <td class="text-end fs-5 fw-bold text-dark" th:text="'$' + ${#numbers.formatDecimal(pago.montoAbonado, 1, 'COMMA', 2, 'POINT')}">
+                                    $17,500.00
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <td colspan="2" class="text-end fw-bold fs-5">TOTAL PERCIBIDO:</td>
+                                <td class="text-end fw-bold fs-4 text-success" th:text="'$' + ${#numbers.formatDecimal(pago.montoAbonado, 1, 'COMMA', 2, 'POINT')}">
+                                    $17,500.00
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- NOTAS Y TEXTO LEGAL FORMAL -->
+                <div class="border rounded p-3 mb-4 bg-light small">
+                    <strong>Texto Formal del Comprobante:</strong>
+                    <pre class="mb-0 mt-2 text-muted" style="font-family: monospace; font-size: 0.8rem;" th:text="${pago.comprobanteTexto}">Texto del comprobante</pre>
+                </div>
+
+                <!-- PIE DEL COMPROBANTE -->
+                <div class="d-flex justify-content-between align-items-center border-top pt-4 text-muted small">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-qr-code fs-2 text-dark"></i>
+                        <div>
+                            <div>Verificación Digital Club Deportivo</div>
+                            <code>UUID: <span th:text="${pago.numeroRecibo}">REC-001</span></code>
+                        </div>
+                    </div>
+                    <div class="text-center" style="width: 220px;">
+                        <div class="border-bottom border-dark pb-3 mb-1"></div>
+                        <span>Firma y Sello de Tesorería</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    @media print {
+        body { background-color: #ffffff !important; }
+        #sidebar, .top-navbar, .d-print-none, footer { display: none !important; }
+        #main-wrapper { margin-left: 0 !important; width: 100% !important; }
+        .content-body { padding: 0 !important; }
+        #reciboImprimible { border: none !important; box-shadow: none !important; }
+    }
+</style>
+</body>
+</html>
+

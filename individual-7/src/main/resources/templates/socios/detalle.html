@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title th:text="'Perfil: ' + ${socio.nombreCompleto}">Detalle de Socio</title>
+</head>
+<body>
+<div id="main-content">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1" th:text="${socio.nombreCompleto}">Nombre Completo</h3>
+            <p class="text-muted small mb-0">
+                Socio Titular <span class="fw-semibold" th:text="${socio.numeroSocio}">SOC-001</span> &bull;
+                Fecha de Alta: <span th:text="${#temporals.format(socio.fechaAlta, 'dd/MM/yyyy')}">01/01/2026</span>
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/cuotas/nueva(socioId=${socio.id})}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-file-earmark-plus"></i> Emitir Nueva Cuota
+            </a>
+            <a th:href="@{/socios/editar/{id}(id=${socio.id})}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-pencil"></i> Editar Datos
+            </a>
+            <a th:href="@{/socios}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- CARD PERFIL Y ROSTRO -->
+        <div class="col-12 col-lg-4">
+            <div class="card h-100 text-center p-4">
+                <div class="mb-3">
+                    <img th:if="${socio.rutaFoto != null}" th:src="${socio.rutaFoto}" alt="Rostro" class="avatar-lg shadow-sm border mb-2"/>
+                    <div th:unless="${socio.rutaFoto != null}" class="avatar-lg bg-light text-secondary d-flex align-items-center justify-content-center mx-auto mb-2">
+                        <i class="bi bi-person-bounding-box fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1" th:text="${socio.nombreCompleto}">Nombre Apellido</h5>
+                    <span class="badge bg-primary mb-2" th:text="${socio.categoria}">ACTIVO</span>
+                    <div>
+                        <span th:if="${socio.alDia}" class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                            <i class="bi bi-check-circle-fill"></i> HABILITADO - AL DÍA
+                        </span>
+                        <span th:unless="${socio.alDia}" class="badge bg-danger-subtle text-danger border border-danger px-3 py-2">
+                            <i class="bi bi-exclamation-octagon-fill"></i> ACCESO BLOQUEADO - CUOTA IMPAGA
+                        </span>
+                    </div>
+                </div>
+
+                <ul class="list-group list-group-flush text-start small mt-3">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">DNI:</span>
+                        <strong th:text="${socio.dni}">12345678</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Edad:</span>
+                        <strong th:text="${socio.edad} + ' años'">35 años</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Nacimiento:</span>
+                        <strong th:text="${#temporals.format(socio.fechaNacimiento, 'dd/MM/yyyy')}">01/01/1990</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Email:</span>
+                        <strong th:text="${socio.email}">email@ejemplo.com</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted">Teléfono:</span>
+                        <strong th:text="${socio.telefono != null ? socio.telefono : 'N/A'}">+54 11 ...</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- GRUPO FAMILIAR Y ADHERENTES (AGREGACIÓN UML) -->
+        <div class="col-12 col-lg-8">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="d-flex align-items-center gap-2">
+                        <i class="bi bi-diagram-3-fill text-primary"></i> Grupo Familiar Vinculado (Agregación UML)
+                    </span>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAdherente">
+                        <i class="bi bi-person-plus"></i> Agregar Familiar Adherente
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div th:if="${grupoFamiliar == null}" class="alert alert-warning small">
+                        Este socio no posee grupo familiar constituido actualmente.
+                    </div>
+                    <div th:if="${grupoFamiliar != null}">
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded small">
+                            <div><strong>Código Grupo:</strong> <code th:text="${grupoFamiliar.codigo}">GF-001</code></div>
+                            <div><strong>Total Integrantes:</strong> <span class="badge bg-dark" th:text="${grupoFamiliar.cantidadTotalIntegrantes}">1</span></div>
+                        </div>
+
+                        <h6 class="fw-bold small text-muted text-uppercase mb-2">Familiares Adherentes Registrados</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead class="table-light small">
+                                    <tr>
+                                        <th>Rostro</th>
+                                        <th>Nombre y Apellido</th>
+                                        <th>DNI</th>
+                                        <th>Vínculo</th>
+                                        <th>Edad</th>
+                                        <th>Condición</th>
+                                        <th class="text-end">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(grupoFamiliar.adherentes)}">
+                                        <td colspan="7" class="text-center text-muted py-3 small">No hay adherentes asociados. El socio titular abona su plan individual.</td>
+                                    </tr>
+                                    <tr th:each="adh : ${grupoFamiliar.adherentes}">
+                                        <td>
+                                            <img th:if="${adh.rutaFoto != null}" th:src="${adh.rutaFoto}" alt="Rostro" class="avatar-img" style="width: 32px; height: 32px;"/>
+                                            <div th:unless="${adh.rutaFoto != null}" class="avatar-img bg-light text-secondary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                        </td>
+                                        <td class="fw-semibold small" th:text="${adh.nombreCompleto}">Nombre</td>
+                                        <td class="small" th:text="${adh.dni}">DNI</td>
+                                        <td><span class="badge bg-light text-dark border small" th:text="${adh.parentesco}">HIJO</span></td>
+                                        <td class="small" th:text="${adh.edad} + ' años'">12</td>
+                                        <td>
+                                            <span th:if="${adh.menorDeEdad}" class="badge bg-warning-subtle text-warning border border-warning small">
+                                                <i class="bi bi-shield-check"></i> Menor de Edad
+                                            </span>
+                                            <span th:unless="${adh.menorDeEdad}" class="badge bg-secondary-subtle text-secondary small">Mayor</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <form th:action="@{/familias/adherente/eliminar/{id}(id=${adh.id})}" method="post" class="d-inline" onsubmit="return confirm('¿Desvincular familiar?');">
+                                                <input type="hidden" name="socioId" th:value="${socio.id}"/>
+                                                <button type="submit" class="btn btn-xs btn-outline-danger py-0 px-2" title="Quitar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORIAL DE CUOTAS Y PAGOS MULTICANAL -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="d-flex align-items-center gap-2">
+                <i class="bi bi-credit-card-fill text-success"></i> Estado de Cuotas Sociales y Cobranzas
+            </span>
+            <span class="small text-muted">Abono permitido con Efectivo, Transferencia o Mercado Pago</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>Periodo</th>
+                            <th>Monto Base</th>
+                            <th>Recargo Mora</th>
+                            <th>Total Exigible</th>
+                            <th>Vencimiento</th>
+                            <th>Estado Cuota</th>
+                            <th>Fecha Pago</th>
+                            <th>N° Recibo</th>
+                            <th class="text-end pe-3">Acción de Cobranza</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(cuotas)}">
+                            <td colspan="9" class="text-center text-muted py-4">No se registran cuotas emitidas para este socio.</td>
+                        </tr>
+                        <tr th:each="c : ${cuotas}">
+                            <td><strong class="text-dark" th:text="${c.periodo}">2026-09</strong></td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(c.montoBase, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(c.montoRecargo, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                            <td>
+                                <strong class="text-primary fs-6" th:text="'$' + ${#numbers.formatDecimal(c.totalExigible, 1, 'COMMA', 2, 'POINT')}">$0.00</strong>
+                            </td>
+                            <td>
+                                <span th:text="${#temporals.format(c.fechaVencimiento, 'dd/MM/yyyy')}">10/09/2026</span>
+                                <span th:if="${c.vencida}" class="badge bg-danger ms-1" style="font-size: 0.65rem;">VENCIDA</span>
+                            </td>
+                            <td>
+                                <span th:if="${c.estado.name() == 'PAGADA'}" class="badge bg-success-subtle text-success border border-success">
+                                    <i class="bi bi-check-circle"></i> PAGADA
+                                </span>
+                                <span th:if="${c.estado.name() == 'PENDIENTE'}" class="badge bg-warning-subtle text-warning border border-warning">
+                                    <i class="bi bi-clock"></i> PENDIENTE
+                                </span>
+                                <span th:if="${c.estado.name() == 'VENCIDA'}" class="badge bg-danger-subtle text-danger border border-danger">
+                                    <i class="bi bi-exclamation-triangle"></i> VENCIDA
+                                </span>
+                            </td>
+                            <td class="small" th:text="${c.fechaPago != null ? #temporals.format(c.fechaPago, 'dd/MM/yyyy') : '-'}">-</td>
+                            <td>
+                                <code th:if="${c.numeroRecibo != null}" th:text="${c.numeroRecibo}">REC-01</code>
+                                <span th:unless="${c.numeroRecibo != null}" class="text-muted small">-</span>
+                            </td>
+                            <td class="text-end pe-3">
+                                <!-- Botón Pagar Cuota si está pendiente o vencida -->
+                                <a th:if="${c.estado.name() != 'PAGADA'}"
+                                   th:href="@{/pagos/registrar/{id}(id=${c.id})}"
+                                   class="btn btn-sm btn-success fw-semibold shadow-sm d-inline-flex align-items-center gap-1">
+                                    <i class="bi bi-credit-card"></i> Pagar Cuota
+                                </a>
+                                <!-- Botón Ver Recibo si ya fue abonada -->
+                                <a th:if="${c.estado.name() == 'PAGADA'}"
+                                   th:href="@{/pagos/recibo/{id}(id=${c.pagoId})}"
+                                   class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+                                    <i class="bi bi-printer"></i> Recibo
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AGREGAR ADHERENTE -->
+    <div class="modal fade" id="modalAdherente" tabindex="-1" aria-labelledby="modalAdherenteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/familias/adherente/guardar}" method="post">
+                    <input type="hidden" name="socioTitularId" th:value="${socio.id}"/>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalAdherenteLabel"><i class="bi bi-person-plus text-primary"></i> Nuevo Familiar Adherente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">DNI</label>
+                            <input type="text" name="dni" class="form-control" required placeholder="Número de documento">
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col">
+                                <label class="form-label small fw-semibold">Nombre</label>
+                                <input type="text" name="nombre" class="form-control" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label small fw-semibold">Apellido</label>
+                                <input type="text" name="apellido" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col">
+                                <label class="form-label small fw-semibold">Fecha Nacimiento</label>
+                                <input type="date" name="fechaNacimiento" class="form-control" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label small fw-semibold">Parentesco con Titular</label>
+                                <select name="parentesco" class="form-select" required>
+                                    <option value="CONYUGE">Cónyuge</option>
+                                    <option value="HIJO" selected>Hijo</option>
+                                    <option value="HIJA">Hija</option>
+                                    <option value="PADRE">Padre</option>
+                                    <option value="MADRE">Madre</option>
+                                    <option value="HERMANO">Hermano</option>
+                                    <option value="HERMANA">Hermana</option>
+                                    <option value="OTRO">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Guardar Adherente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

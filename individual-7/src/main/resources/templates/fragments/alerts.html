@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="alerts">
+        <!-- Success Alert -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <span th:text="${successMessage}">Operación realizada con éxito.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+
+        <!-- Error Alert -->
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show shadow-sm d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span th:text="${errorMessage}">Ocurrió un error.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+
+        <!-- Warning Alert -->
+        <div th:if="${warningMessage}" class="alert alert-warning alert-dismissible fade show shadow-sm d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-circle-fill fs-5"></i>
+            <span th:text="${warningMessage}">Advertencia en la operación.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+
+        <!-- Info Alert -->
+        <div th:if="${infoMessage}" class="alert alert-info alert-dismissible fade show shadow-sm d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-info-circle-fill fs-5"></i>
+            <span th:text="${infoMessage}">Información del sistema.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    </div>
+</body>
+</html>
+

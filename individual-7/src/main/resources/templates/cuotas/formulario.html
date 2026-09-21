@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title>Emitir Cuota Social</title>
+</head>
+<body>
+<div id="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Emitir Cuota Social Familiar</h3>
+            <p class="text-muted small mb-0">Generación de arancel mensual con fecha de vencimiento y cálculo de recargo por mora</p>
+        </div>
+        <a th:href="@{/cuotas}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver a Cuotas
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-receipt text-primary me-2"></i> Parámetros de la Cuota Social
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/cuotas/emitir}" th:object="${cuotaDTO}" method="post">
+                        <div class="row g-3">
+                            <!-- Socio Titular -->
+                            <div class="col-12">
+                                <label for="socioTitularId" class="form-label small fw-semibold">Socio Titular / Familia <span class="text-danger">*</span></label>
+                                <select class="form-select" id="socioTitularId" th:field="*{socioTitularId}" th:errorclass="is-invalid">
+                                    <option value="" disabled selected>-- Seleccione el Socio Titular Responsable --</option>
+                                    <option th:each="s : ${socios}" th:value="${s.id}" th:text="${s.nombreCompleto} + ' (N° ' + ${s.numeroSocio} + ' - DNI: ' + ${s.dni} + ')'"></option>
+                                </select>
+                                <div class="invalid-feedback" th:errors="*{socioTitularId}">Debe seleccionar un socio titular</div>
+                            </div>
+
+                            <!-- Periodo y Vencimiento -->
+                            <div class="col-md-6">
+                                <label for="periodo" class="form-label small fw-semibold">Periodo Facturado (YYYY-MM) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="periodo" th:field="*{periodo}" th:errorclass="is-invalid" placeholder="Ej: 2026-09">
+                                <div class="invalid-feedback" th:errors="*{periodo}">Formato requerido: YYYY-MM</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="fechaVencimiento" class="form-label small fw-semibold">Fecha Límite de Vencimiento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fechaVencimiento" th:field="*{fechaVencimiento}" th:errorclass="is-invalid">
+                                <div class="invalid-feedback" th:errors="*{fechaVencimiento}">Fecha de vencimiento obligatoria</div>
+                            </div>
+
+                            <!-- Monto Base y Recargo -->
+                            <div class="col-md-6">
+                                <label for="montoBase" class="form-label small fw-semibold">Monto Base de la Cuota ($) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" step="0.01" class="form-control" id="montoBase" th:field="*{montoBase}" th:errorclass="is-invalid">
+                                </div>
+                                <div class="invalid-feedback" th:errors="*{montoBase}">El monto base debe ser mayor a 0</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="montoRecargo" class="form-label small fw-semibold">Recargo por Mora en caso de Vencimiento ($)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" step="0.01" class="form-control" id="montoRecargo" th:field="*{montoRecargo}">
+                                </div>
+                                <div class="form-text small">Se sumará automáticamente si se abona superada la fecha de vencimiento.</div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/cuotas}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                                <i class="bi bi-file-earmark-check me-1"></i> Emitir Cuota
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

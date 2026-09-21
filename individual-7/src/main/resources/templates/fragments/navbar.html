@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+    <header th:fragment="navbar" class="top-navbar">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button" onclick="toggleSidebar()">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <div class="d-none d-md-flex align-items-center gap-2 text-secondary">
+                <i class="bi bi-geo-alt-fill text-primary"></i>
+                <span class="small fw-semibold">Sede Polideportiva Central &bull; Club Atlético Deportivo</span>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <a th:href="@{/accesos}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                <i class="bi bi-qr-code-scan"></i> Molinete
+            </a>
+
+            <div class="dropdown">
+                <button class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center gap-2 border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-fill text-primary"></i>
+                    <span sec:authentication="name" class="fw-semibold small">Usuario</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><h6 class="dropdown-header">Sesión Activa</h6></li>
+                    <li><span class="dropdown-item-text text-muted small" sec:authentication="principal.authorities">Rol</span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="px-2">
+                            <button type="submit" class="btn btn-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+</body>
+</html>
+

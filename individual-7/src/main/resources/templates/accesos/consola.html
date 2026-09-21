@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title>Consola de Molinetes</title>
+</head>
+<body>
+<div id="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Terminal de Control de Accesos (Molinetes)</h3>
+            <p class="text-muted small mb-0">Validación biométrica de identidad, verificación de cuota al día y registro de tiempos de entrada y salida</p>
+        </div>
+        <a th:href="@{/accesos/historial}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-clock-history"></i> Ver Historial Completo
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- CONSOLA DE PASO EN VIVO -->
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm border-dark">
+                <div class="card-header bg-dark text-white fw-semibold d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-door-open-fill text-warning me-2"></i> Registro de Paso en Molinete</span>
+                    <span class="badge bg-success">Sistema en Línea</span>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/accesos/registrar}" th:object="${accesoDTO}" method="post">
+                        <!-- Punto de Acceso (Molinete) -->
+                        <div class="mb-3">
+                            <label for="puntoDeAccesoId" class="form-label small fw-semibold">Punto de Control / Molinete <span class="text-danger">*</span></label>
+                            <select class="form-select" id="puntoDeAccesoId" th:field="*{puntoDeAccesoId}" required>
+                                <option th:each="p : ${puntosAcceso}" th:value="${p.id}"
+                                        th:text="${p.nombre} + ' (' + ${p.ubicacion} + ') - ' + ${p.estado}"
+                                        th:disabled="${!p.habilitarPaso()}">Molinete 1</option>
+                            </select>
+                        </div>
+
+                        <!-- DNI de la Persona -->
+                        <div class="mb-3">
+                            <label for="dniPersona" class="form-label small fw-semibold">DNI o Código de Carnet <span class="text-danger">*</span></label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light"><i class="bi bi-upc-scan"></i></span>
+                                <input type="text" class="form-control fw-bold" id="dniPersona" th:field="*{dniPersona}"
+                                       placeholder="Ingrese DNI (ej: 32456789)" required autofocus>
+                            </div>
+                            <div class="form-text small">Escriba el DNI o escanee el código de barras del carnet social.</div>
+                        </div>
+
+                        <!-- Sentido del Movimiento (Entrada o Salida) -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Tipo de Movimiento <span class="text-danger">*</span></label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="tipoMovimiento" id="movEntrada" value="ENTRADA" th:field="*{tipoMovimiento}" checked>
+                                    <label class="btn btn-outline-success w-100 py-3 fw-bold d-flex flex-column align-items-center gap-1" for="movEntrada">
+                                        <i class="bi bi-box-arrow-in-right fs-4"></i> ENTRADA
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="tipoMovimiento" id="movSalida" value="SALIDA" th:field="*{tipoMovimiento}">
+                                    <label class="btn btn-outline-secondary w-100 py-3 fw-bold d-flex flex-column align-items-center gap-1" for="movSalida">
+                                        <i class="bi bi-box-arrow-right fs-4"></i> SALIDA
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="mb-4">
+                            <label for="observacion" class="form-label small fw-semibold">Observación Operativa (Opcional)</label>
+                            <input type="text" class="form-control form-control-sm" id="observacion" th:field="*{observacion}" placeholder="Ej: Ingreso con pase especial...">
+                        </div>
+
+                        <!-- Botón de Registro -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark btn-lg fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-check2-circle fs-4 text-warning"></i> Validar Identidad y Registrar Paso
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- DNI de Prueba Rápida -->
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="small fw-semibold text-muted mb-2">DNIs para Probar en Molinete:</div>
+                        <div class="d-flex flex-wrap gap-1">
+                            <button type="button" class="btn btn-xs btn-outline-success" onclick="setDni('32456789')">
+                                Carlos Gómez (Al Día)
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-warning" onclick="setDni('52333444')">
+                                Mateo Gómez (Hijo Menor)
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-danger" onclick="setDni('35987654')">
+                                Mariana Morales (Cuota Vencida)
+                            </button>
+                            <button type="button" class="btn btn-xs btn-outline-info" onclick="setDni('28999111')">
+                                Prof. Lucas (Empleado)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTADO EN VIVO DE ÚLTIMOS ACCESOS CON ROSTROS -->
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold"><i class="bi bi-shield-check text-primary me-2"></i> Monitor en Tiempo Real de Accesos</span>
+                    <span class="small text-muted">Últimos 20 registros</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light small">
+                                <tr>
+                                    <th>Rostro</th>
+                                    <th>Persona</th>
+                                    <th>Punto Control</th>
+                                    <th>Hora</th>
+                                    <th>Movimiento</th>
+                                    <th>Permanencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(ultimosAccesos)}">
+                                    <td colspan="6" class="text-center text-muted py-4">No se registran pasos en este momento.</td>
+                                </tr>
+                                <tr th:each="acc : ${ultimosAccesos}">
+                                    <td>
+                                        <img th:if="${acc.rutaFoto != null}" th:src="${acc.rutaFoto}" alt="Rostro" class="avatar-img shadow-sm"/>
+                                        <div th:unless="${acc.rutaFoto != null}" class="avatar-img bg-light text-secondary d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold small" th:text="${acc.personaNombreCompleto}">Persona</div>
+                                        <div class="small text-muted" th:text="'DNI: ' + ${acc.personaDni} + ' &bull; ' + ${acc.tipoPersona}">DNI</div>
+                                        <div th:if="${acc.observacion != null and !acc.observacion.isBlank()}" class="small text-danger fw-semibold" th:text="${acc.observacion}">Obs</div>
+                                    </td>
+                                    <td class="small" th:text="${acc.puntoDeAccesoNombre}">Molinete</td>
+                                    <td class="small fw-semibold">
+                                        <span th:if="${acc.fechaHoraEntrada != null}" th:text="${#temporals.format(acc.fechaHoraEntrada, 'HH:mm:ss')}">10:00:00</span>
+                                        <span th:if="${acc.fechaHoraSalida != null and acc.fechaHoraEntrada == null}" th:text="${#temporals.format(acc.fechaHoraSalida, 'HH:mm:ss')}">10:00:00</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${acc.tipoMovimiento.name() == 'ENTRADA'}" class="badge bg-success-subtle text-success border border-success">
+                                            <i class="bi bi-box-arrow-in-right"></i> ENTRADA
+                                        </span>
+                                        <span th:if="${acc.tipoMovimiento.name() == 'SALIDA'}" class="badge bg-secondary-subtle text-secondary border">
+                                            <i class="bi bi-box-arrow-right"></i> SALIDA
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border small" th:text="${acc.permanenciaMinutos} + ' min'">0 min</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function setDni(dni) {
+        document.getElementById('dniPersona').value = dni;
+    }
+</script>
+</body>
+</html>
+

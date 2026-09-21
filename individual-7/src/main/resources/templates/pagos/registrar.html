@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title>Registrar Pago de Cuota</title>
+</head>
+<body>
+<div id="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Registrar Pago de Cuota Social</h3>
+            <p class="text-muted small mb-0">Cobro multicanal para familias del club: Efectivo, Transferencia y Mercado Pago</p>
+        </div>
+        <a th:href="@{/cuotas}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver a Cuotas
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- RESUMEN DE LA CUOTA A ABONAR -->
+        <div class="col-12 col-lg-5">
+            <div class="card h-100 shadow-sm border-primary border-opacity-25">
+                <div class="card-header bg-primary bg-opacity-10 text-primary fw-bold">
+                    <i class="bi bi-receipt-cutoff me-2"></i> Detalle de la Cuota Familiar
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <span class="text-muted small text-uppercase fw-semibold">Periodo a Cancelar</span>
+                        <h2 class="fw-bold text-dark my-1" th:text="${cuota.periodo}">2026-09</h2>
+                        <div>
+                            <span th:if="${cuota.vencida}" class="badge bg-danger-subtle text-danger border border-danger px-3 py-1">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Cuota Vencida con Recargo
+                            </span>
+                            <span th:unless="${cuota.vencida}" class="badge bg-warning-subtle text-warning border border-warning px-3 py-1">
+                                <i class="bi bi-clock-history"></i> Periodo en Término
+                            </span>
+                        </div>
+                    </div>
+
+                    <ul class="list-group list-group-flush small mb-4">
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Socio Titular:</span>
+                            <strong th:text="${cuota.socioTitularNombre}">Carlos Gómez</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">N° de Socio:</span>
+                            <strong th:text="${cuota.socioTitularNumero}">SOC-1001</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Grupo Familiar:</span>
+                            <code th:text="${cuota.grupoFamiliarCodigo != null ? cuota.grupoFamiliarCodigo : 'Individual'}">GF-01</code>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Fecha Límite Vencimiento:</span>
+                            <span th:text="${#temporals.format(cuota.fechaVencimiento, 'dd/MM/yyyy')}">10/09/2026</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Monto Base:</span>
+                            <span th:text="'$' + ${#numbers.formatDecimal(cuota.montoBase, 1, 'COMMA', 2, 'POINT')}">$15,000.00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0" th:if="${cuota.vencida}">
+                            <span class="text-danger fw-semibold">Recargo por Mora:</span>
+                            <span class="text-danger fw-semibold" th:text="'+ $' + ${#numbers.formatDecimal(cuota.montoRecargo, 1, 'COMMA', 2, 'POINT')}">+$2,500.00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0 pt-3 border-top border-2">
+                            <strong class="fs-5 text-dark">Total Exigible:</strong>
+                            <strong class="fs-4 text-primary" id="displayTotalExigible"
+                                    th:text="'$' + ${#numbers.formatDecimal(cuota.totalExigible, 1, 'COMMA', 2, 'POINT')}">$17,500.00</strong>
+                        </li>
+                    </ul>
+
+                    <div class="alert alert-info small mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle-fill fs-5"></i>
+                        <span>Al confirmar este abono, el socio y todos sus adherentes quedarán inmediatamente <strong>habilitados en los molinetes</strong>.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE COBRANZA MULTICANAL -->
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <i class="bi bi-credit-card-2-front text-success me-2"></i> Selección de Medio de Pago
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/pagos/procesar}" th:object="${pagoDTO}" method="post" id="formPago">
+                        <input type="hidden" th:field="*{cuotaId}"/>
+
+                        <!-- SELECTOR VISUAL DE MEDIOS DE PAGO (ThemeWagon Bootstrap Cards) -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Elija la Modalidad de Pago <span class="text-danger">*</span></label>
+                            <div class="row g-2">
+                                <!-- Opción EFECTIVO -->
+                                <div class="col-4">
+                                    <input type="radio" class="btn-check" name="tipoMedioPago" id="medioEfectivo" value="EFECTIVO"
+                                           th:field="*{tipoMedioPago}" checked onchange="cambiarMedioPago('EFECTIVO')">
+                                    <label class="btn btn-outline-success w-100 p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center" for="medioEfectivo">
+                                        <i class="bi bi-cash-stack fs-3 mb-1"></i>
+                                        <span class="fw-bold small">Efectivo</span>
+                                        <small class="text-muted" style="font-size: 0.7rem;">Caja / Ventanilla</small>
+                                    </label>
+                                </div>
+
+                                <!-- Opción TRANSFERENCIA -->
+                                <div class="col-4">
+                                    <input type="radio" class="btn-check" name="tipoMedioPago" id="medioTransferencia" value="TRANSFERENCIA"
+                                           th:field="*{tipoMedioPago}" onchange="cambiarMedioPago('TRANSFERENCIA')">
+                                    <label class="btn btn-outline-primary w-100 p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center" for="medioTransferencia">
+                                        <i class="bi bi-bank fs-3 mb-1"></i>
+                                        <span class="fw-bold small">Transferencia</span>
+                                        <small class="text-muted" style="font-size: 0.7rem;">CBU / Alias</small>
+                                    </label>
+                                </div>
+
+                                <!-- Opción MERCADO PAGO -->
+                                <div class="col-4">
+                                    <input type="radio" class="btn-check" name="tipoMedioPago" id="medioMP" value="MERCADO_PAGO"
+                                           th:field="*{tipoMedioPago}" onchange="cambiarMedioPago('MERCADO_PAGO')">
+                                    <label class="btn btn-outline-info w-100 p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center" for="medioMP">
+                                        <i class="bi bi-qr-code fs-3 mb-1"></i>
+                                        <span class="fw-bold small">Mercado Pago</span>
+                                        <small class="text-muted" style="font-size: 0.7rem;">QR / Digital</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MONTO A COBRAR -->
+                        <div class="mb-4">
+                            <label for="montoAbonado" class="form-label small fw-semibold">Monto Final a Percibir ($) <span class="text-danger">*</span></label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light fw-bold">$</span>
+                                <input type="number" step="0.01" class="form-control fw-bold text-success" id="montoAbonado" th:field="*{montoAbonado}" required>
+                            </div>
+                        </div>
+
+                        <!-- ========================================================================= -->
+                        <!-- SECCIÓN CONDICIONAL: EFECTIVO -->
+                        <!-- ========================================================================= -->
+                        <div id="seccionEfectivo" class="border rounded p-3 bg-light mb-4">
+                            <h6 class="fw-bold text-success small mb-3"><i class="bi bi-cash me-1"></i> Datos de Cobro en Ventanilla</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label small">Bonificación / Descuento ($)</label>
+                                    <input type="number" step="0.01" class="form-control form-control-sm" th:field="*{descuentoAplicado}" id="descuentoAplicado" oninput="recalcularEfectivo()">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Número de Caja</label>
+                                    <input type="text" class="form-control form-control-sm" th:field="*{numeroCaja}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small">Cajero / Operador Responsable</label>
+                                    <input type="text" class="form-control form-control-sm" th:field="*{cajeroResponsable}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ========================================================================= -->
+                        <!-- SECCIÓN CONDICIONAL: TRANSFERENCIA BANCARIA -->
+                        <!-- ========================================================================= -->
+                        <div id="seccionTransferencia" class="border rounded p-3 bg-light mb-4 d-none">
+                            <h6 class="fw-bold text-primary small mb-3"><i class="bi bi-bank me-1"></i> Conciliación de Transferencia Bancaria</h6>
+                            <div class="p-2 mb-3 bg-white rounded border small">
+                                <div class="text-muted">CBU Institucional Receptor del Club:</div>
+                                <code class="fw-bold text-dark fs-6" th:text="*{cbuDestino}">0000003100010002000304</code>
+                                <input type="hidden" th:field="*{cbuDestino}"/>
+                                <div class="text-muted mt-1">Alias: <strong>CLUB.DEPORTIVO.PAGOS</strong> &bull; Banco Galicia</div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label small">CBU / CVU Emisor del Socio</label>
+                                    <input type="text" class="form-control form-control-sm" th:field="*{cbuOrigen}" placeholder="22 dígitos o CVU">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Banco o Billetera Emisora</label>
+                                    <select class="form-select form-select-sm" th:field="*{bancoOrigen}">
+                                        <option value="Banco Galicia">Banco Galicia</option>
+                                        <option value="Banco Santander">Banco Santander</option>
+                                        <option value="Banco Nación">Banco Nación</option>
+                                        <option value="Banco BBVA">Banco BBVA</option>
+                                        <option value="Mercado Pago (Billetera)">Mercado Pago CVU</option>
+                                        <option value="Otro Banco">Otro</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Número de Operación / Transferencia <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm" th:field="*{numeroOperacion}" placeholder="Ej: TRF-98124571">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Hash o Código Comprobante</label>
+                                    <input type="text" class="form-control form-control-sm" th:field="*{comprobanteHash}" placeholder="Código de verificación">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ========================================================================= -->
+                        <!-- SECCIÓN CONDICIONAL: MERCADO PAGO -->
+                        <!-- ========================================================================= -->
+                        <div id="seccionMercadoPago" class="border rounded p-3 bg-light mb-4 d-none">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h6 class="fw-bold text-info small mb-0"><i class="bi bi-qr-code me-1"></i> Checkout Mercado Pago Fintech</h6>
+                                <span class="badge bg-info text-dark">Pasarela Digital 2.0</span>
+                            </div>
+
+                            <div class="text-center p-3 bg-white rounded border mb-3">
+                                <!-- QR Mockup con SVG inline -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="130" height="130" viewBox="0 0 130 130" class="mb-2 shadow-sm border p-1 rounded bg-white">
+                                    <rect width="130" height="130" fill="#ffffff"/>
+                                    <!-- QR pattern mockup -->
+                                    <rect x="10" y="10" width="35" height="35" fill="#009ee3"/>
+                                    <rect x="16" y="16" width="23" height="23" fill="#ffffff"/>
+                                    <rect x="21" y="21" width="13" height="13" fill="#009ee3"/>
+                                    <rect x="85" y="10" width="35" height="35" fill="#009ee3"/>
+                                    <rect x="91" y="16" width="23" height="23" fill="#ffffff"/>
+                                    <rect x="96" y="21" width="13" height="13" fill="#009ee3"/>
+                                    <rect x="10" y="85" width="35" height="35" fill="#009ee3"/>
+                                    <rect x="16" y="91" width="23" height="23" fill="#ffffff"/>
+                                    <rect x="21" y="96" width="13" height="13" fill="#009ee3"/>
+                                    <!-- QR matrix dots -->
+                                    <rect x="55" y="15" width="8" height="8" fill="#1e293b"/>
+                                    <rect x="70" y="25" width="8" height="8" fill="#1e293b"/>
+                                    <rect x="55" y="45" width="8" height="8" fill="#1e293b"/>
+                                    <rect x="70" y="55" width="8" height="8" fill="#1e293b"/>
+                                    <rect x="85" y="70" width="8" height="8" fill="#1e293b"/>
+                                    <rect x="55" y="85" width="8" height="8" fill="#1e293b"/>
+                                    <rect x="70" y="105" width="8" height="8" fill="#1e293b"/>
+                                    <rect x="105" y="95" width="8" height="8" fill="#1e293b"/>
+                                </svg>
+                                <div class="small fw-semibold text-dark">Escaneá con la App de Mercado Pago</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Acreditación instantánea en cuenta corriente del club</div>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label small">ID de Pago en Mercado Pago (Payment ID)</label>
+                                    <input type="text" class="form-control form-control-sm" th:field="*{mpPaymentId}" id="mpPaymentId" placeholder="Ej: MP-894521742">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Preferencia Checkout</label>
+                                    <input type="text" class="form-control form-control-sm" th:field="*{mpPreferenceId}" placeholder="PREF-CLUB-0926">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NOTAS ADICIONALES -->
+                        <div class="mb-4">
+                            <label for="notas" class="form-label small fw-semibold">Notas / Observaciones de Cobro</label>
+                            <input type="text" class="form-control" id="notas" th:field="*{notas}" placeholder="Ej: Pago total cuota familiar septiembre...">
+                        </div>
+
+                        <!-- BOTÓN ACCIÓN FINAL -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-check2-circle fs-4"></i> Confirmar Pago y Emitir Recibo Oficial
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const totalOriginal = parseFloat([[${cuota.totalExigible}]]);
+
+    function cambiarMedioPago(tipo) {
+        document.getElementById('seccionEfectivo').classList.add('d-none');
+        document.getElementById('seccionTransferencia').classList.add('d-none');
+        document.getElementById('seccionMercadoPago').classList.add('d-none');
+
+        if (tipo === 'EFECTIVO') {
+            document.getElementById('seccionEfectivo').classList.remove('d-none');
+            recalcularEfectivo();
+        } else if (tipo === 'TRANSFERENCIA') {
+            document.getElementById('seccionTransferencia').classList.remove('d-none');
+            document.getElementById('montoAbonado').value = totalOriginal.toFixed(2);
+        } else if (tipo === 'MERCADO_PAGO') {
+            document.getElementById('seccionMercadoPago').classList.remove('d-none');
+            document.getElementById('montoAbonado').value = totalOriginal.toFixed(2);
+            if (!document.getElementById('mpPaymentId').value) {
+                document.getElementById('mpPaymentId').value = 'MP-' + Math.floor(100000000 + Math.random() * 900000000);
+            }
+        }
+    }
+
+    function recalcularEfectivo() {
+        let desc = parseFloat(document.getElementById('descuentoAplicado').value) || 0;
+        let finalMonto = totalOriginal - desc;
+        if (finalMonto < 0) finalMonto = 0;
+        document.getElementById('montoAbonado').value = finalMonto.toFixed(2);
+    }
+    /*]]>*/
+</script>
+</body>
+</html>
+

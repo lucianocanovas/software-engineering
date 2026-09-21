@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(titulo, contenido)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><th:block th:replace="${titulo}">Club Deportivo</th:block> - Sistema Club</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bs-primary: #0d6efd;
+            --sidebar-width: 260px;
+            --sidebar-bg: #1e293b;
+            --sidebar-color: #94a3b8;
+            --sidebar-active-bg: #2563eb;
+            --sidebar-active-color: #ffffff;
+            --content-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--content-bg);
+            color: #334155;
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            min-height: 100vh;
+            color: var(--sidebar-color);
+            transition: all 0.3s;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar .brand {
+            padding: 1.5rem 1.25rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        #sidebar .nav-link {
+            color: var(--sidebar-color);
+            padding: 0.8rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.925rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            margin: 0.2rem 0.75rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        #sidebar .nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(255,255,255,0.06);
+        }
+
+        #sidebar .nav-link.active {
+            color: var(--sidebar-active-color);
+            background-color: var(--sidebar-active-bg);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+
+        #sidebar .nav-heading {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 1rem 1.5rem 0.4rem;
+            font-weight: 700;
+        }
+
+        #main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .top-navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .content-body {
+            padding: 2rem 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.85rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 1.5rem;
+            background-color: #ffffff;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+        }
+
+        .avatar-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e2e8f0;
+        }
+
+        .avatar-lg {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3b82f6;
+        }
+
+        .kpi-icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 992px) {
+            #sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            #sidebar.show {
+                margin-left: 0;
+            }
+            #main-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR FRAGMENT -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- MAIN WRAPPER -->
+    <div id="main-wrapper">
+        <!-- NAVBAR FRAGMENT -->
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+        <!-- CONTENT BODY -->
+        <main class="content-body">
+            <!-- ALERTS FRAGMENT -->
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <!-- INYECCIÓN DEL CONTENIDO DINÁMICO -->
+            <th:block th:replace="${contenido}"/>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-white border-top py-3 px-4 text-center text-muted small">
+            <div class="d-flex justify-content-between align-items-center">
+                <span>&copy; 2026 <strong>Club Deportivo</strong> - Ejercicio "a" con IA &bull; MVC + Thymeleaf + MySQL + DTOs + Auditoría + Seguridad</span>
+                <span>ThemeWagon Bootstrap 5 Framework</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
+

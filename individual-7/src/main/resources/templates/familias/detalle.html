@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::#main-content})}">
+<head>
+    <title th:text="'Grupo Familiar: ' + ${grupo.codigo}">Grupo Familiar</title>
+</head>
+<body>
+<div id="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1" th:text="'Grupo Familiar ' + ${grupo.codigo}">Grupo Familiar</h3>
+            <p class="text-muted small mb-0">
+                Encabezado por el Socio Titular: <strong th:text="${grupo.titularNombre}">Titular</strong> (N° <span th:text="${grupo.titularNumeroSocio}">001</span>)
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/socios/{id}(id=${grupo.titularId})}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-person"></i> Ver Perfil Titular
+            </a>
+            <a th:href="@{/familias}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- CARDS DE MIEMBROS INTEGRANTES -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-people-fill text-primary me-2"></i> Miembros del Núcleo Familiar (<span th:text="${grupo.cantidadTotalIntegrantes}">1</span>)</span>
+            <span class="badge bg-light text-dark border">Agregación UML</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>Rol / Vínculo</th>
+                            <th>Nombre Completo</th>
+                            <th>DNI</th>
+                            <th>Edad</th>
+                            <th>Condición Legal</th>
+                            <th>Habilitación en Molinete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Fila del Socio Titular -->
+                        <tr class="table-primary table-opacity-25">
+                            <td><span class="badge bg-primary">SOCIO TITULAR (Cabeza)</span></td>
+                            <td class="fw-bold" th:text="${grupo.titularNombre}">Titular</td>
+                            <td th:text="${grupo.titularDni}">12345678</td>
+                            <td>-</td>
+                            <td>Mayor Titular</td>
+                            <td>
+                                <span th:if="${grupo.titularAlDia}" class="badge bg-success">Habilitado</span>
+                                <span th:unless="${grupo.titularAlDia}" class="badge bg-danger">Inhabilitado por Mora</span>
+                            </td>
+                        </tr>
+                        <!-- Filas de los Adherentes -->
+                        <tr th:each="adh : ${grupo.adherentes}">
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary border" th:text="'Adherente: ' + ${adh.parentesco}">Hijo</span>
+                            </td>
+                            <td class="fw-semibold" th:text="${adh.nombreCompleto}">Nombre Adherente</td>
+                            <td th:text="${adh.dni}">DNI</td>
+                            <td th:text="${adh.edad} + ' años'">14</td>
+                            <td>
+                                <span th:if="${adh.menorDeEdad}" class="badge bg-warning-subtle text-warning border border-warning">
+                                    <i class="bi bi-shield-check"></i> Menor de 18 años
+                                </span>
+                                <span th:unless="${adh.menorDeEdad}" class="badge bg-light text-dark border">Mayor</span>
+                            </td>
+                            <td>
+                                <span th:if="${grupo.titularAlDia}" class="badge bg-success">Habilitado</span>
+                                <span th:unless="${grupo.titularAlDia}" class="badge bg-danger">Bloqueado por Cuota Familiar</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUOTAS FAMILIARES -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-receipt text-success me-2"></i> Cuotas Emitidas para este Grupo Familiar
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>Periodo</th>
+                            <th>Monto Base</th>
+                            <th>Recargo Mora</th>
+                            <th>Total Exigible</th>
+                            <th>Vencimiento</th>
+                            <th>Estado</th>
+                            <th>Fecha Pago</th>
+                            <th class="text-end pe-3">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(cuotas)}">
+                            <td colspan="8" class="text-center text-muted py-4">No hay cuotas emitidas para este grupo familiar.</td>
+                        </tr>
+                        <tr th:each="c : ${cuotas}">
+                            <td><strong class="text-dark" th:text="${c.periodo}">2026-09</strong></td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(c.montoBase, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                            <td th:text="'$' + ${#numbers.formatDecimal(c.montoRecargo, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                            <td><strong class="text-primary" th:text="'$' + ${#numbers.formatDecimal(c.totalExigible, 1, 'COMMA', 2, 'POINT')}">$0.00</strong></td>
+                            <td th:text="${#temporals.format(c.fechaVencimiento, 'dd/MM/yyyy')}">10/09/2026</td>
+                            <td>
+                                <span th:if="${c.estado.name() == 'PAGADA'}" class="badge bg-success-subtle text-success border border-success">PAGADA</span>
+                                <span th:if="${c.estado.name() == 'PENDIENTE'}" class="badge bg-warning-subtle text-warning border border-warning">PENDIENTE</span>
+                                <span th:if="${c.estado.name() == 'VENCIDA'}" class="badge bg-danger-subtle text-danger border border-danger">VENCIDA</span>
+                            </td>
+                            <td class="small" th:text="${c.fechaPago != null ? #temporals.format(c.fechaPago, 'dd/MM/yyyy') : '-'}">-</td>
+                            <td class="text-end pe-3">
+                                <a th:if="${c.estado.name() != 'PAGADA'}" th:href="@{/pagos/registrar/{id}(id=${c.id})}" class="btn btn-sm btn-success fw-semibold">
+                                    <i class="bi bi-credit-card"></i> Pagar Cuota
+                                </a>
+                                <a th:if="${c.estado.name() == 'PAGADA'}" th:href="@{/pagos/recibo/{id}(id=${c.pagoId})}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-printer"></i> Ver Recibo
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+    <div th:fragment="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="bi bi-shield-shaded fs-3 text-primary"></i>
+            <div>
+                <div class="lh-1">Club Deportivo</div>
+                <small class="text-secondary fs-6 fw-normal" style="font-size: 0.75rem !important;">Gestión & Acceso</small>
+            </div>
+        </div>
+
+        <div class="flex-grow-1 overflow-y-auto py-2">
+            <div class="nav-heading">Principal</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI == '/dashboard' ? 'active' : ''}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-heading">Madrón & Familias</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/socios}">
+                        <i class="bi bi-people"></i> Socios Titulares
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/familias}">
+                        <i class="bi bi-diagram-3"></i> Grupos Familiares
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-heading">Tesorería & Pagos</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/cuotas}">
+                        <i class="bi bi-receipt"></i> Cuotas Mensuales
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/pagos}">
+                        <i class="bi bi-credit-card-2-front"></i> Registro de Pagos
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-heading">Control Biométrico</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/accesos}">
+                        <i class="bi bi-door-open"></i> Molinete en Vivo
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/accesos/historial}">
+                        <i class="bi bi-clock-history"></i> Historial de Accesos
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="p-3 border-top border-secondary border-opacity-25 bg-black bg-opacity-25">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-person-circle fs-3 text-secondary"></i>
+                <div class="flex-grow-1 overflow-hidden">
+                    <div class="text-white text-truncate small fw-bold" sec:authentication="name">Usuario</div>
+                    <div class="text-secondary small" style="font-size: 0.72rem !important;" sec:authentication="principal.authorities">ROL</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
